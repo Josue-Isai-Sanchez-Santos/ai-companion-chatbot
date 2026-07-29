@@ -1,58 +1,108 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# AI Companion Chatbot
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplicación web para conversar con un personaje ficticio que conserva personalidad, contexto, memorias y progreso de relación.
 
-## About Laravel
+## Objetivo
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Desarrollar un chatbot conversacional con continuidad narrativa y memoria persistente. El sistema permitirá que cada usuario tenga una versión personalizada del personaje, sin modificar la definición original compartida por la aplicación.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Este proyecto no pretende recrear ni clonar OurDream.ai. Únicamente toma como referencia el concepto general de conversar con un personaje persistente. No incluirá la plataforma social, el sistema comercial ni las funciones multimedia de ese servicio.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Estado del proyecto
 
-## Learning Laravel
+**Estado actual:** desarrollo inicial.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Actualmente se encuentra completada la instalación base de Laravel. La arquitectura, la base de datos, la autenticación y los módulos conversacionales todavía están en proceso de implementación.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Tecnologías previstas
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+- PHP 8.5
+- Laravel 13
+- Blade
+- Livewire
+- Alpine.js
+- PostgreSQL
+- pgvector
+- Docker Compose
+- Laravel Queue
+- Vite
+- PHPUnit
+- Proveedor externo de inteligencia artificial
+- Modelo local compatible mediante una abstracción de proveedor
 
-## Agentic Development
+Algunas tecnologías todavía no están instaladas. Esta lista representa la arquitectura prevista para la versión 1.0.
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Alcance de la versión 1.0
+
+La primera versión incluirá:
+
+- Registro e inicio de sesión.
+- Un personaje base.
+- Un perfil personalizado del personaje por usuario.
+- Conversaciones e historial persistente.
+- Personalidad y forma de hablar configurables.
+- Expresiones y estado emocional.
+- Memoria semántica.
+- Resúmenes de conversaciones.
+- Estado y progreso de relación.
+- Respuestas generadas progresivamente.
+- Regeneración de respuestas.
+- Restablecimiento completo del personaje.
+- Cambio entre proveedor externo y modelo local.
+- Pruebas automatizadas.
+- Documentación técnica.
+
+## Fuera del alcance de la versión 1.0
+
+La primera versión no incluirá:
+
+- Generación de imágenes.
+- Generación o reproducción de voz.
+- Generación de video.
+- Pagos.
+- Monedas virtuales.
+- Suscripciones.
+- Aplicación móvil.
+- Comunidad de usuarios.
+- Personajes públicos.
+- Marketplace.
+- Fine-tuning de modelos.
+- Entrenamiento de un modelo de lenguaje propio.
+
+Estas funciones solo podrán evaluarse después de completar y validar la experiencia conversacional de la versión 1.0.
+
+## Principios de diseño
+
+- El personaje base no será modificado por las conversaciones.
+- Cada usuario tendrá un perfil independiente del personaje.
+- El proveedor de inteligencia artificial no accederá directamente a la base de datos.
+- Las memorias serán seleccionadas según relevancia, no enviadas indiscriminadamente.
+- El usuario podrá revisar y eliminar sus memorias.
+- El restablecimiento eliminará la evolución del personaje, pero conservará la cuenta y la definición original.
+- Las claves, contraseñas y archivos `.env` no serán almacenados en Git.
+
+## Estructura documental
+
+La documentación técnica se encuentra en `docs/`:
+
+- `architecture.md`: arquitectura general.
+- `database-design.md`: diseño de la base de datos.
+- `memory-system.md`: funcionamiento de la memoria.
+- `prompt-contract.md`: contrato de construcción de prompts.
+- `reset-contract.md`: comportamiento del restablecimiento.
+- `roadmap.md`: orden de desarrollo.
+- `threat-model.md`: riesgos y controles de seguridad.
+
+## Desarrollo local
+
+El proyecto se desarrolla dentro de Ubuntu mediante WSL.
 
 ```bash
-composer require laravel/boost --dev
+cd ~/proyectos/ai-companion-chatbot
+php artisan serve
 
-php artisan boost:install
-```
+Para ejecutar Vite durante el desarrollo:
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+npm run dev
+Pruebas
+php artisan test```
