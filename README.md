@@ -100,9 +100,20 @@ El proyecto se desarrolla dentro de Ubuntu mediante WSL.
 ```bash
 cd ~/proyectos/ai-companion-chatbot
 php artisan serve
+```
 
 Para ejecutar Vite durante el desarrollo:
 
+```bash
 npm run dev
-Pruebas
-php artisan test```
+```
+
+## Pruebas
+
+```bash
+php artisan test
+```
+
+## Licencia
+
+La licencia del proyecto se definirá antes de publicar la versión 1.0.

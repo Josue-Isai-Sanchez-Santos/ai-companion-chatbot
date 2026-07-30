@@ -4,11 +4,19 @@
 
 Este documento describirá las entidades, relaciones, restricciones, índices y decisiones de persistencia utilizadas por AI Companion Chatbot.
 
-## Estado
+## Estado del proyecto
 
-**Borrador.**
+**Estado actual:** desarrollo de la versión 1.0.
 
-El modelo definitivo será validado durante la creación de las migraciones.
+Actualmente están completados:
+
+- Instalación base de Laravel.
+- Documentación inicial.
+- PostgreSQL mediante Docker Compose.
+- Persistencia mediante volumen Docker.
+- Activación de pgvector mediante migración.
+
+La autenticación y los módulos conversacionales todavía están pendientes.
 
 ## Alcance de la versión 1.0
 
@@ -39,20 +47,23 @@ La extensión se habilita mediante una migración de Laravel utilizando:
 
 ```php
 Schema::ensureVectorExtensionExists();
+```
 
 Esta operación equivale a ejecutar:
 
+```sql
 CREATE EXTENSION IF NOT EXISTS vector;
+```
 
 La migración permite preparar una base de datos nueva sin requerir una configuración SQL manual.
 
 En la versión 1.0, pgvector se utilizará para:
 
-Almacenar embeddings de memorias.
-Comparar el mensaje actual con recuerdos existentes.
-Recuperar únicamente las memorias semánticamente relevantes.
-Evitar enviar indiscriminadamente todas las memorias al modelo.
+- Almacenar embeddings de memorias.
+- Comparar el mensaje actual con recuerdos existentes.
+- Recuperar únicamente las memorias semánticamente relevantes.
+- Evitar enviar indiscriminadamente todas las memorias al modelo.
 
 Las dimensiones concretas de los vectores dependerán del modelo de embeddings seleccionado posteriormente.
 
-La extensión se instala antes de crear cualquier tabla que contenga columnas del tipo vector.
+La extensión se instala antes de crear cualquier tabla que contenga columnas del tipo `vector`.
