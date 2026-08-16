@@ -5,6 +5,8 @@ namespace App\Models;
 use Database\Factories\CharacterFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Character extends Model
 {
@@ -37,5 +39,16 @@ class Character extends Model
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+
+    public function expressions(): HasMany
+    {
+        return $this->hasMany(CharacterExpression::class);
+    }
+
+    public function defaultExpression(): HasOne
+    {
+        return $this->hasOne(CharacterExpression::class)
+            ->where('is_default', true);
     }
 }
