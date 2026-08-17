@@ -51,4 +51,9 @@ class Character extends Model
         return $this->hasOne(CharacterExpression::class)
             ->where('is_default', true);
     }
+
+    public function userProfiles(): HasMany
+    {
+        return $this->hasMany(UserCharacterProfile::class);
+    }
 }

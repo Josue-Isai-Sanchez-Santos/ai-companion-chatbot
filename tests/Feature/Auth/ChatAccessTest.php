@@ -3,6 +3,7 @@
 namespace Tests\Feature\Auth;
 
 use App\Models\User;
+use Database\Seeders\CharacterSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -26,6 +27,8 @@ class ChatAccessTest extends TestCase
 
     public function test_authenticated_users_can_view_chat(): void
     {
+        $this->seed(CharacterSeeder::class);
+
         $user = User::factory()->create();
 
         $response = $this
