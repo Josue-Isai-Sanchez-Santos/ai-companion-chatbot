@@ -216,24 +216,23 @@
                     @endif
                 </header>
 
-                <div class="flex flex-1 items-center justify-center p-6 text-center sm:p-10">
-                    <div class="max-w-sm">
-                        <div
-                            class="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-zinc-800 bg-zinc-950 text-xl text-zinc-600"
-                            aria-hidden="true"
-                        >
-                            …
-                        </div>
+                @if ($selectedConversation)
+                    <div class="min-h-0 flex-1">
+                        <livewire:chat.message-list
+                            :conversation-id="$selectedConversation->id"
+                            :key="'messages-'.$selectedConversation->id"
+                        />
+                    </div>
+                @else
+                    <div class="flex flex-1 items-center justify-center p-6 text-center sm:p-10">
+                        <div class="max-w-sm">
+                            <div
+                                class="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-zinc-800 bg-zinc-950 text-xl text-zinc-600"
+                                aria-hidden="true"
+                            >
+                                …
+                            </div>
 
-                        @if ($selectedConversation)
-                            <h3 class="mt-4 font-medium text-zinc-300">
-                                Todavía no hay mensajes
-                            </h3>
-
-                            <p class="mt-2 text-sm leading-6 text-zinc-500">
-                                Los mensajes se implementarán en el siguiente punto.
-                            </p>
-                        @else
                             <h3 class="mt-4 font-medium text-zinc-300">
                                 Ninguna conversación seleccionada
                             </h3>
@@ -241,27 +240,49 @@
                             <p class="mt-2 text-sm leading-6 text-zinc-500">
                                 Usa el botón “Nueva” para crear tu primera conversación.
                             </p>
-                        @endif
+                        </div>
                     </div>
-                </div>
+                @endif
 
                 <div class="border-t border-zinc-800 bg-zinc-950/40 p-3 sm:p-4">
-                    <div class="flex items-end gap-2">
-                        <textarea
-                            rows="1"
-                            disabled
-                            placeholder="Los mensajes estarán disponibles próximamente..."
-                            class="min-h-11 flex-1 resize-none rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-zinc-500 outline-none disabled:cursor-not-allowed disabled:opacity-70"
-                        ></textarea>
+                    <form
+                        wire:submit="sendMessage"
+                        class="space-y-2"
+                    >
+                        <div class="flex items-end gap-2">
+                            <label for="message" class="sr-only">
+                                Escribe un mensaje
+                            </label>
 
-                        <button
-                            type="button"
-                            disabled
-                            class="h-11 shrink-0 cursor-not-allowed rounded-xl bg-zinc-700 px-4 text-sm font-semibold text-zinc-400 opacity-70"
-                        >
-                            Enviar
-                        </button>
-                    </div>
+                            <textarea
+                                id="message"
+                                rows="1"
+                                wire:model="message"
+                                maxlength="{{ config('chatbot.message_max_length') }}"
+                                @disabled($selectedConversation === null)
+                                placeholder="{{ $selectedConversation
+                                    ? 'Escribe un mensaje...'
+                                    : 'Selecciona una conversación...' }}"
+                                class="min-h-11 flex-1 resize-none rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-zinc-100 outline-none placeholder:text-zinc-600 focus:border-zinc-600 disabled:cursor-not-allowed disabled:opacity-50"
+                            ></textarea>
+
+                            <button
+                                type="submit"
+                                @disabled($selectedConversation === null)
+                                wire:loading.attr="disabled"
+                                wire:target="sendMessage"
+                                class="h-11 shrink-0 rounded-xl bg-zinc-100 px-4 text-sm font-semibold text-zinc-950 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
+                            >
+                                Enviar
+                            </button>
+                        </div>
+
+                        @error('message')
+                            <p class="text-sm text-red-400">
+                                {{ $message }}
+                            </p>
+                        @enderror
+                    </form>
                 </div>
             </section>
         </div>

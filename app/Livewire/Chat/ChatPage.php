@@ -6,6 +6,7 @@ use App\Actions\Characters\CreateUserCharacterProfileAction;
 use App\Actions\Conversations\CreateConversationAction;
 use App\Actions\Conversations\DeleteConversationAction;
 use App\Actions\Conversations\RenameConversationAction;
+use App\Actions\Messages\SendMessageAction;
 use App\Enums\CharacterMood;
 use App\Enums\RelationshipStage;
 use App\Models\Character;
@@ -33,6 +34,8 @@ class ChatPage extends Component
 
     #[Validate('required|string|max:160')]
     public string $renamingTitle = '';
+
+    public string $message = '';
 
     public function mount(
         CreateUserCharacterProfileAction $createProfile
@@ -164,6 +167,42 @@ class ChatPage extends Component
                 ->latest('updated_at')
                 ->value('id');
         }
+    }
+
+    public function sendMessage(
+        SendMessageAction $sendMessage
+    ): void {
+        if ($this->conversationId === null) {
+            $this->addError(
+                'message',
+                'Selecciona una conversación antes de enviar.'
+            );
+
+            return;
+        }
+
+        /** @var User $user */
+        $user = auth()->user();
+
+        $conversation = $this->conversationForCurrentProfile(
+            $this->conversationId,
+            'update'
+        );
+
+        $sendMessage->execute(
+            $user,
+            $conversation,
+            $this->message
+        );
+
+        $this->message = '';
+
+        $this->resetValidation('message');
+
+        $this->dispatch(
+            'messages-updated',
+            conversationId: $conversation->id
+        );
     }
 
     public function render(): View

@@ -14,6 +14,11 @@ return [
         20
     ),
 
+    'message_max_length' => (int) env(
+        'CHAT_MESSAGE_MAX_LENGTH',
+        4000
+    ),
+
     /*
     |--------------------------------------------------------------------------
     | Character defaults
