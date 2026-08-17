@@ -2,6 +2,9 @@
 
 namespace App\Actions\Messages;
 
+use App\Ai\Contracts\ChatGateway;
+use App\Ai\DTOs\CharacterContext;
+use App\Ai\DTOs\ChatContext;
 use App\Enums\MessageRole;
 use App\Http\Requests\SendMessageRequest;
 use App\Models\Conversation;
@@ -13,6 +16,10 @@ use Illuminate\Support\Facades\Validator;
 
 class SendMessageAction
 {
+    public function __construct(
+        private readonly ChatGateway $chatGateway
+    ) {}
+
     /**
      * @return array{user: Message, assistant: Message}
      */
@@ -34,10 +41,20 @@ class SendMessageAction
             SendMessageRequest::messageValidationMessages()
         )->validate();
 
+        $context = $this->buildChatContext(
+            $conversation,
+            $validated['message']
+        );
+
+        $reply = $this->chatGateway->generate(
+            $context
+        );
+
         return DB::transaction(
             function () use (
                 $conversation,
-                $validated
+                $validated,
+                $reply
             ): array {
                 $parentMessageId = $conversation
                     ->messages()
@@ -61,12 +78,10 @@ class SendMessageAction
                     ->create([
                         'parent_message_id' => $userMessage->id,
                         'role' => MessageRole::Assistant,
-                        'content' => 'Respuesta simulada: recibí tu mensaje correctamente.',
-                        'metadata' => [
-                            'simulated' => true,
-                        ],
-                        'token_count' => null,
-                        'status' => Message::STATUS_COMPLETED,
+                        'content' => $reply->content,
+                        'metadata' => $reply->metadata,
+                        'token_count' => $reply->tokenCount,
+                        'status' => $reply->status,
                     ]);
 
                 $conversation->forceFill([
@@ -84,6 +99,64 @@ class SendMessageAction
                     'assistant' => $assistantMessage,
                 ];
             }
+        );
+    }
+
+    private function buildChatContext(
+        Conversation $conversation,
+        string $newMessage
+    ): ChatContext {
+        $profile = $conversation
+            ->userCharacterProfile()
+            ->with('character')
+            ->firstOrFail();
+
+        $character = $profile->character;
+
+        $messages = $conversation
+            ->messages()
+            ->chronological()
+            ->get([
+                'role',
+                'content',
+            ])
+            ->map(
+                fn (Message $message): array => [
+                    'role' => $message->role->value,
+                    'content' => $message->content,
+                ]
+            )
+            ->values()
+            ->all();
+
+        $messages[] = [
+            'role' => MessageRole::User->value,
+            'content' => $newMessage,
+        ];
+
+        $characterContext = new CharacterContext(
+            name: $character->name,
+            description: $character->description,
+            personality: $profile->custom_personality
+                ?? $character->base_personality
+                ?? [],
+            backstory: $character->base_backstory,
+            speakingStyle: $profile->custom_speaking_style
+                ?? $character->base_speaking_style
+                ?? [],
+            scenario: $profile->custom_scenario
+                ?? $character->base_scenario,
+            systemRules: $character->system_rules,
+            mood: $profile->current_mood->value,
+            relationshipStage: $profile->relationship_stage->value,
+            nicknameForUser: $profile->nickname_for_user,
+            nicknameForCharacter: $profile->nickname_for_character,
+        );
+
+        return new ChatContext(
+            conversationId: $conversation->id,
+            character: $characterContext,
+            messages: $messages,
         );
     }
 }
