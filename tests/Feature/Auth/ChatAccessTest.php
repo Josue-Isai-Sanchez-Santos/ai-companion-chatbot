@@ -37,8 +37,10 @@ class ChatAccessTest extends TestCase
 
         $response
             ->assertOk()
-            ->assertSee('Sesión autenticada')
-            ->assertSee($user->name)
-            ->assertSee($user->email);
+            ->assertSee('Default Companion')
+            ->assertSee('Conversación')
+            ->assertSee('Configuración')
+            ->assertSee('Restablecer personaje')
+            ->assertSee('Todavía no hay mensajes');
     }
 }
