@@ -6,6 +6,7 @@ use App\Enums\CharacterMood;
 use App\Enums\RelationshipStage;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class UserCharacterProfile extends Model
 {
@@ -58,5 +59,10 @@ class UserCharacterProfile extends Model
             CharacterExpression::class,
             'current_expression_id'
         );
+    }
+
+    public function conversations(): HasMany
+    {
+        return $this->hasMany(Conversation::class);
     }
 }

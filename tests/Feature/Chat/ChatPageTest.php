@@ -56,7 +56,7 @@ class ChatPageTest extends TestCase
             ->assertSee($character->description)
             ->assertSee('Feliz')
             ->assertSee('Amigos')
-            ->assertSee('Todavía no hay mensajes');
+            ->assertSee('Ninguna conversación seleccionada');
     }
 
     public function test_each_user_sees_their_own_profile(): void

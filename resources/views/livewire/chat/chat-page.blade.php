@@ -1,14 +1,11 @@
-<section class="mx-auto w-full max-w-6xl">
+<section class="mx-auto w-full max-w-7xl">
     <div class="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div class="min-w-0">
             <p class="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
                 Personaje activo
             </p>
 
-            <h1
-                class="mt-2 truncate text-2xl font-semibold text-zinc-100 sm:text-3xl"
-                data-testid="character-name"
-            >
+            <h1 class="mt-2 truncate text-2xl font-semibold text-zinc-100 sm:text-3xl">
                 {{ $profile->nickname_for_character ?: $character->name }}
             </h1>
 
@@ -21,7 +18,6 @@
             <button
                 type="button"
                 disabled
-                title="Disponible próximamente"
                 class="cursor-not-allowed rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-400 opacity-70"
             >
                 Configuración
@@ -30,7 +26,6 @@
             <button
                 type="button"
                 disabled
-                title="Disponible próximamente"
                 class="cursor-not-allowed rounded-lg border border-red-900/70 px-4 py-2 text-sm font-medium text-red-400 opacity-70"
             >
                 Restablecer personaje
@@ -38,11 +33,9 @@
         </div>
     </div>
 
-    <div class="grid gap-4 lg:grid-cols-[18rem_minmax(0,1fr)]">
-        <aside class="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4 sm:p-5">
-            <div
-                class="flex aspect-square w-full items-center justify-center overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950"
-            >
+    <div class="grid gap-4 lg:grid-cols-[16rem_minmax(0,1fr)]">
+        <aside class="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
+            <div class="flex aspect-square w-full items-center justify-center overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950">
                 @if ($character->avatar_path)
                     <img
                         src="{{ asset('storage/' . $character->avatar_path) }}"
@@ -65,10 +58,7 @@
                         Expresión actual
                     </p>
 
-                    <p
-                        class="mt-1 font-medium text-zinc-200"
-                        data-testid="current-expression"
-                    >
+                    <p class="mt-1 font-medium text-zinc-200">
                         {{ $expressionLabel }}
                     </p>
                 </div>
@@ -78,10 +68,7 @@
                         Estado de ánimo
                     </p>
 
-                    <p
-                        class="mt-1 font-medium text-zinc-200"
-                        data-testid="current-mood"
-                    >
+                    <p class="mt-1 font-medium text-zinc-200">
                         {{ $moodLabel }}
                     </p>
                 </div>
@@ -91,75 +78,192 @@
                         Relación
                     </p>
 
-                    <p
-                        class="mt-1 font-medium text-zinc-200"
-                        data-testid="relationship-stage"
-                    >
+                    <p class="mt-1 font-medium text-zinc-200">
                         {{ $relationshipLabel }}
                     </p>
                 </div>
             </div>
         </aside>
 
-        <section
-            class="flex min-h-[32rem] flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/70 lg:min-h-[38rem]"
-        >
-            <header class="border-b border-zinc-800 px-4 py-4 sm:px-5">
-                <h2 class="font-semibold text-zinc-100">
-                    Conversación
-                </h2>
-
-                <p class="mt-1 text-sm text-zinc-500">
-                    El sistema de mensajes se implementará en el siguiente punto.
-                </p>
-            </header>
-
-            <div
-                class="flex flex-1 items-center justify-center p-6 text-center sm:p-10"
-                data-testid="message-area"
-            >
-                <div class="max-w-sm">
-                    <div
-                        class="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-zinc-800 bg-zinc-950 text-xl text-zinc-600"
-                        aria-hidden="true"
-                    >
-                        …
-                    </div>
-
-                    <h3 class="mt-4 font-medium text-zinc-300">
-                        Todavía no hay mensajes
-                    </h3>
-
-                    <p class="mt-2 text-sm leading-6 text-zinc-500">
-                        Aquí aparecerá el historial de conversación cuando
-                        implementemos el sistema de mensajes.
-                    </p>
-                </div>
-            </div>
-
-            <div class="border-t border-zinc-800 bg-zinc-950/40 p-3 sm:p-4">
-                <div class="flex items-end gap-2">
-                    <label for="message" class="sr-only">
-                        Escribe un mensaje
-                    </label>
-
-                    <textarea
-                        id="message"
-                        rows="1"
-                        disabled
-                        placeholder="La escritura estará disponible próximamente..."
-                        class="min-h-11 flex-1 resize-none rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-zinc-500 outline-none disabled:cursor-not-allowed disabled:opacity-70"
-                    ></textarea>
+        <div class="grid min-w-0 gap-4 md:grid-cols-[17rem_minmax(0,1fr)]">
+            <aside class="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/70">
+                <header class="flex items-center justify-between gap-3 border-b border-zinc-800 p-4">
+                    <h2 class="font-semibold text-zinc-100">
+                        Conversaciones
+                    </h2>
 
                     <button
                         type="button"
-                        disabled
-                        class="h-11 shrink-0 cursor-not-allowed rounded-xl bg-zinc-700 px-4 text-sm font-semibold text-zinc-400 opacity-70"
+                        wire:click="createConversation"
+                        class="shrink-0 rounded-lg border border-zinc-700 px-3 py-2 text-xs font-medium text-zinc-200 transition hover:bg-zinc-800"
                     >
-                        Enviar
+                        Nueva
                     </button>
+                </header>
+
+                <div class="max-h-[36rem] space-y-2 overflow-y-auto p-3">
+                    @forelse ($conversations as $conversation)
+                        <div
+                            wire:key="conversation-{{ $conversation->id }}"
+                            class="rounded-xl border p-2
+                                {{ $conversationId === $conversation->id
+                                    ? 'border-zinc-600 bg-zinc-800/80'
+                                    : 'border-zinc-800 bg-zinc-950/50' }}"
+                        >
+                            @if ($renamingConversationId === $conversation->id)
+                                <form
+                                    wire:submit="renameConversation"
+                                    class="space-y-2"
+                                >
+                                    <input
+                                        type="text"
+                                        wire:model="renamingTitle"
+                                        maxlength="160"
+                                        class="w-full rounded-lg border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 outline-none focus:border-zinc-500"
+                                        autofocus
+                                    >
+
+                                    @error('renamingTitle')
+                                        <p class="text-xs text-red-400">
+                                            {{ $message }}
+                                        </p>
+                                    @enderror
+
+                                    <div class="flex gap-2">
+                                        <button
+                                            type="submit"
+                                            class="rounded-md bg-zinc-700 px-2 py-1 text-xs text-zinc-100 hover:bg-zinc-600"
+                                        >
+                                            Guardar
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            wire:click="cancelRenamingConversation"
+                                            class="rounded-md px-2 py-1 text-xs text-zinc-400 hover:bg-zinc-800"
+                                        >
+                                            Cancelar
+                                        </button>
+                                    </div>
+                                </form>
+                            @else
+                                <button
+                                    type="button"
+                                    wire:click="selectConversation({{ $conversation->id }})"
+                                    class="block w-full min-w-0 text-left"
+                                >
+                                    <span class="block truncate text-sm font-medium text-zinc-200">
+                                        {{ $conversation->title }}
+                                    </span>
+
+                                    <span class="mt-1 block text-xs text-zinc-500">
+                                        {{ $conversation->updated_at->format('d/m/Y H:i') }}
+                                    </span>
+                                </button>
+
+                                <div class="mt-2 flex gap-2 border-t border-zinc-800 pt-2">
+                                    <button
+                                        type="button"
+                                        wire:click="startRenamingConversation({{ $conversation->id }})"
+                                        class="text-xs text-zinc-400 hover:text-zinc-200"
+                                    >
+                                        Renombrar
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        wire:click="deleteConversation({{ $conversation->id }})"
+                                        wire:confirm="¿Eliminar esta conversación?"
+                                        class="text-xs text-red-500 hover:text-red-400"
+                                    >
+                                        Eliminar
+                                    </button>
+                                </div>
+                            @endif
+                        </div>
+                    @empty
+                        <div class="px-3 py-8 text-center">
+                            <p class="text-sm text-zinc-400">
+                                No hay conversaciones.
+                            </p>
+
+                            <p class="mt-1 text-xs leading-5 text-zinc-600">
+                                Crea una para comenzar.
+                            </p>
+                        </div>
+                    @endforelse
                 </div>
-            </div>
-        </section>
+            </aside>
+
+            <section class="flex min-h-[32rem] min-w-0 flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/70 lg:min-h-[38rem]">
+                <header class="border-b border-zinc-800 px-4 py-4 sm:px-5">
+                    @if ($selectedConversation)
+                        <h2 class="truncate font-semibold text-zinc-100">
+                            {{ $selectedConversation->title }}
+                        </h2>
+
+                        <p class="mt-1 text-sm text-zinc-500">
+                            Conversación seleccionada
+                        </p>
+                    @else
+                        <h2 class="font-semibold text-zinc-100">
+                            Conversación
+                        </h2>
+
+                        <p class="mt-1 text-sm text-zinc-500">
+                            Selecciona o crea una conversación.
+                        </p>
+                    @endif
+                </header>
+
+                <div class="flex flex-1 items-center justify-center p-6 text-center sm:p-10">
+                    <div class="max-w-sm">
+                        <div
+                            class="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-zinc-800 bg-zinc-950 text-xl text-zinc-600"
+                            aria-hidden="true"
+                        >
+                            …
+                        </div>
+
+                        @if ($selectedConversation)
+                            <h3 class="mt-4 font-medium text-zinc-300">
+                                Todavía no hay mensajes
+                            </h3>
+
+                            <p class="mt-2 text-sm leading-6 text-zinc-500">
+                                Los mensajes se implementarán en el siguiente punto.
+                            </p>
+                        @else
+                            <h3 class="mt-4 font-medium text-zinc-300">
+                                Ninguna conversación seleccionada
+                            </h3>
+
+                            <p class="mt-2 text-sm leading-6 text-zinc-500">
+                                Usa el botón “Nueva” para crear tu primera conversación.
+                            </p>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="border-t border-zinc-800 bg-zinc-950/40 p-3 sm:p-4">
+                    <div class="flex items-end gap-2">
+                        <textarea
+                            rows="1"
+                            disabled
+                            placeholder="Los mensajes estarán disponibles próximamente..."
+                            class="min-h-11 flex-1 resize-none rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-zinc-500 outline-none disabled:cursor-not-allowed disabled:opacity-70"
+                        ></textarea>
+
+                        <button
+                            type="button"
+                            disabled
+                            class="h-11 shrink-0 cursor-not-allowed rounded-xl bg-zinc-700 px-4 text-sm font-semibold text-zinc-400 opacity-70"
+                        >
+                            Enviar
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
     </div>
 </section>

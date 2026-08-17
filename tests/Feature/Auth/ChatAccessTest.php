@@ -41,6 +41,6 @@ class ChatAccessTest extends TestCase
             ->assertSee('Conversación')
             ->assertSee('Configuración')
             ->assertSee('Restablecer personaje')
-            ->assertSee('Todavía no hay mensajes');
+            ->assertSee('Ninguna conversación seleccionada');
     }
 }
