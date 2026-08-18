@@ -5,6 +5,7 @@ namespace Tests\Fakes;
 use App\Ai\Contracts\ChatGateway;
 use App\Ai\DTOs\ChatContext;
 use App\Ai\DTOs\GeneratedReply;
+use Throwable;
 
 final class FakeChatGateway implements ChatGateway
 {
@@ -14,6 +15,8 @@ final class FakeChatGateway implements ChatGateway
     public array $contexts = [];
 
     private GeneratedReply $reply;
+
+    private ?Throwable $failure = null;
 
     public function __construct()
     {
@@ -31,10 +34,20 @@ final class FakeChatGateway implements ChatGateway
         $this->reply = $reply;
     }
 
+    public function failWith(
+        Throwable $failure
+    ): void {
+        $this->failure = $failure;
+    }
+
     public function generate(
         ChatContext $context
     ): GeneratedReply {
         $this->contexts[] = $context;
+
+        if ($this->failure !== null) {
+            throw $this->failure;
+        }
 
         return $this->reply;
     }

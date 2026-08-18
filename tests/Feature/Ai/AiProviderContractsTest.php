@@ -9,6 +9,7 @@ use App\Ai\Contracts\EmbeddingGateway;
 use App\Ai\DTOs\CharacterContext;
 use App\Ai\DTOs\ChatContext;
 use App\Ai\DTOs\GeneratedReply;
+use App\Ai\Gateways\LaravelAiGateway;
 use App\Ai\Gateways\SimulatedChatGateway;
 use App\Models\Character;
 use App\Models\User;
@@ -245,6 +246,27 @@ class AiProviderContractsTest extends TestCase
             $context->messages[
                 count($context->messages) - 1
             ]['role']
+        );
+    }
+
+    public function test_laravel_ai_gateway_can_be_selected_by_configuration(): void
+    {
+        config()->set(
+            'ai.chat.driver',
+            'laravel'
+        );
+
+        $this->app->forgetInstance(
+            ChatGateway::class
+        );
+
+        $gateway = app(
+            ChatGateway::class
+        );
+
+        $this->assertInstanceOf(
+            LaravelAiGateway::class,
+            $gateway
         );
     }
 }

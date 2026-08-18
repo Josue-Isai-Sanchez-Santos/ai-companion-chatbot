@@ -189,7 +189,7 @@ class ChatPage extends Component
             'update'
         );
 
-        $sendMessage->execute(
+        $result = $sendMessage->execute(
             $user,
             $conversation,
             $this->message
@@ -203,6 +203,12 @@ class ChatPage extends Component
             'messages-updated',
             conversationId: $conversation->id
         );
+        if ($result['error'] !== null) {
+            $this->addError(
+                'message',
+                $result['error']
+            );
+        }
     }
 
     public function render(): View

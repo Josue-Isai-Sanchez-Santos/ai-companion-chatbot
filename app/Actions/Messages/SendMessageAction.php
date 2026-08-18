@@ -3,6 +3,7 @@
 namespace App\Actions\Messages;
 
 use App\Ai\Agents\CharacterAgent;
+use App\Ai\Exceptions\AiGatewayException;
 use App\Enums\MessageRole;
 use App\Http\Requests\SendMessageRequest;
 use App\Models\Conversation;
@@ -19,7 +20,11 @@ class SendMessageAction
     ) {}
 
     /**
-     * @return array{user: Message, assistant: Message}
+     * @return array{
+     *     user: Message,
+     *     assistant: Message|null,
+     *     error: string|null
+     * }
      */
     public function execute(
         User $user,
@@ -39,61 +44,115 @@ class SendMessageAction
             SendMessageRequest::messageValidationMessages()
         )->validate();
 
-        $reply = $this->characterAgent->reply(
-            $user,
-            $conversation,
-            $validated['message']
-        );
-
-        return DB::transaction(
+        /*
+         * The user message is committed BEFORE
+         * contacting the external AI provider.
+         */
+        $userMessage = DB::transaction(
             function () use (
                 $conversation,
-                $validated,
-                $reply
-            ): array {
+                $validated
+            ): Message {
                 $parentMessageId = $conversation
                     ->messages()
                     ->latest('created_at')
                     ->latest('id')
                     ->value('id');
 
-                $userMessage = $conversation
+                $message = $conversation
                     ->messages()
                     ->create([
                         'parent_message_id' => $parentMessageId,
+
                         'role' => MessageRole::User,
+
                         'content' => $validated['message'],
+
                         'metadata' => null,
                         'token_count' => null,
+
                         'status' => Message::STATUS_COMPLETED,
                     ]);
 
-                $assistantMessage = $conversation
-                    ->messages()
-                    ->create([
-                        'parent_message_id' => $userMessage->id,
-                        'role' => MessageRole::Assistant,
-                        'content' => $reply->content,
-                        'metadata' => $reply->metadata,
-                        'token_count' => $reply->tokenCount,
-                        'status' => $reply->status,
-                    ]);
-
                 $conversation->forceFill([
-                    'last_message_at' => $assistantMessage->created_at,
+                    'last_message_at' => $message->created_at,
                 ])->save();
 
                 $conversation
                     ->userCharacterProfile()
                     ->update([
-                        'last_interaction_at' => $assistantMessage->created_at,
+                        'last_interaction_at' => $message->created_at,
                     ]);
 
-                return [
-                    'user' => $userMessage,
-                    'assistant' => $assistantMessage,
-                ];
+                return $message;
             }
         );
+
+        try {
+            $reply = $this
+                ->characterAgent
+                ->reply(
+                    $user,
+                    $conversation,
+                    $userMessage->content,
+                    persistedMessage: $userMessage
+                );
+        } catch (AiGatewayException $exception) {
+            report($exception);
+
+            return [
+                'user' => $userMessage,
+                'assistant' => null,
+
+                'error' => 'No fue posible obtener una respuesta de IA. '
+                    .'Tu mensaje quedó guardado.',
+            ];
+        }
+
+        /*
+         * Only persist the assistant after a
+         * complete provider response exists.
+         */
+        $assistantMessage = DB::transaction(
+            function () use (
+                $conversation,
+                $userMessage,
+                $reply
+            ): Message {
+                $message = $conversation
+                    ->messages()
+                    ->create([
+                        'parent_message_id' => $userMessage->id,
+
+                        'role' => MessageRole::Assistant,
+
+                        'content' => $reply->content,
+
+                        'metadata' => $reply->metadata,
+
+                        'token_count' => $reply->tokenCount,
+
+                        'status' => $reply->status,
+                    ]);
+
+                $conversation->forceFill([
+                    'last_message_at' => $message->created_at,
+                ])->save();
+
+                $conversation
+                    ->userCharacterProfile()
+                    ->update([
+                        'last_interaction_at' => $message->created_at,
+                    ]);
+
+                return $message;
+            }
+        );
+
+        return [
+            'user' => $userMessage,
+            'assistant' => $assistantMessage,
+            'error' => null,
+        ];
     }
 }

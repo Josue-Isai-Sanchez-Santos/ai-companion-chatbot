@@ -27,13 +27,15 @@ final class CharacterAgent
         User $user,
         Conversation $conversation,
         string $newMessage,
-        array $relevantMemories = []
+        array $relevantMemories = [],
+        ?Message $persistedMessage = null
     ): GeneratedReply {
         $context = $this->contextFor(
             $user,
             $conversation,
             $newMessage,
-            $relevantMemories
+            $relevantMemories,
+            $persistedMessage
         );
 
         return $this->chatGateway->generate(
@@ -48,13 +50,27 @@ final class CharacterAgent
         User $user,
         Conversation $conversation,
         string $newMessage,
-        array $relevantMemories = []
+        array $relevantMemories = [],
+        ?Message $persistedMessage = null
     ): ChatContext {
         Gate::forUser($user)->authorize(
             'view',
             $conversation
         );
-
+        if ($persistedMessage !== null) {
+            if (
+                $persistedMessage->conversation_id
+                    !== $conversation->id
+                || $persistedMessage->role
+                    !== MessageRole::User
+                || $persistedMessage->content
+                    !== $newMessage
+            ) {
+                throw new \LogicException(
+                    'Persisted message does not match the current conversation prompt.'
+                );
+            }
+        }
         $profile = $conversation
             ->userCharacterProfile()
             ->with('character')
@@ -78,8 +94,18 @@ final class CharacterAgent
         $messages = [];
 
         if ($historyLimit > 0) {
-            $messages = $conversation
-                ->messages()
+            $query = $conversation
+                ->messages();
+
+            if ($persistedMessage !== null) {
+                $query->where(
+                    'id',
+                    '<',
+                    $persistedMessage->id
+                );
+            }
+
+            $messages = $query
                 ->orderByDesc('created_at')
                 ->orderByDesc('id')
                 ->limit($historyLimit)
