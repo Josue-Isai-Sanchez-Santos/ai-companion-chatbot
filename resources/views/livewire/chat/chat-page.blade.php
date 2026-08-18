@@ -246,9 +246,14 @@
 
                 <div class="border-t border-zinc-800 bg-zinc-950/40 p-3 sm:p-4">
                     <form
-                        wire:submit="sendMessage"
+                        data-chat-stream-form
+                        data-conversation-id="{{ $selectedConversation?->id }}"
+                        data-stream-url="{{ route('chat.stream') }}"
+                        data-retry-url="{{ route('chat.stream.retry') }}"
                         class="space-y-2"
                     >
+                        @csrf
+
                         <div class="flex items-end gap-2">
                             <label for="message" class="sr-only">
                                 Escribe un mensaje
@@ -256,8 +261,9 @@
 
                             <textarea
                                 id="message"
+                                name="message"
                                 rows="1"
-                                wire:model="message"
+                                data-chat-message
                                 maxlength="{{ config('chatbot.message_max_length') }}"
                                 @disabled($selectedConversation === null)
                                 placeholder="{{ $selectedConversation
@@ -268,14 +274,23 @@
 
                             <button
                                 type="submit"
+                                data-chat-submit
                                 @disabled($selectedConversation === null)
-                                wire:loading.attr="disabled"
-                                wire:target="sendMessage"
                                 class="h-11 shrink-0 rounded-xl bg-zinc-100 px-4 text-sm font-semibold text-zinc-950 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
                             >
                                 Enviar
                             </button>
                         </div>
+
+                        <p
+                            data-chat-status
+                            class="hidden text-sm text-zinc-500"
+                        ></p>
+
+                        <p
+                            data-chat-error
+                            class="hidden text-sm text-red-400"
+                        ></p>
 
                         @error('message')
                             <p class="text-sm text-red-400">

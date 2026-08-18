@@ -45,6 +45,32 @@ final class CharacterAgent
 
     /**
      * @param  list<string>  $relevantMemories
+     * @param  callable(string): void  $onDelta
+     */
+    public function streamReply(
+        User $user,
+        Conversation $conversation,
+        string $newMessage,
+        callable $onDelta,
+        array $relevantMemories = [],
+        ?Message $persistedMessage = null
+    ): GeneratedReply {
+        $context = $this->contextFor(
+            $user,
+            $conversation,
+            $newMessage,
+            $relevantMemories,
+            $persistedMessage
+        );
+
+        return $this->chatGateway->stream(
+            $context,
+            $onDelta
+        );
+    }
+
+    /**
+     * @param  list<string>  $relevantMemories
      */
     public function contextFor(
         User $user,

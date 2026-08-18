@@ -10,7 +10,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Message extends Model
 {
+    public const STATUS_STREAMING = 'streaming';
+
     public const STATUS_COMPLETED = 'completed';
+
+    public const STATUS_FAILED = 'failed';
+
+    public const STATUS_INTERRUPTED = 'interrupted';
 
     protected $fillable = [
         'parent_message_id',

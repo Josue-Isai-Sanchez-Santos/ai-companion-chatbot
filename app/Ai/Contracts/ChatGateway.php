@@ -10,4 +10,12 @@ interface ChatGateway
     public function generate(
         ChatContext $context
     ): GeneratedReply;
+
+    /**
+     * @param  callable(string): void  $onDelta
+     */
+    public function stream(
+        ChatContext $context,
+        callable $onDelta
+    ): GeneratedReply;
 }

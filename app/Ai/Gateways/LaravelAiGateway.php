@@ -6,7 +6,9 @@ use App\Ai\Contracts\ChatGateway;
 use App\Ai\DTOs\ChatContext;
 use App\Ai\DTOs\GeneratedReply;
 use App\Ai\Exceptions\AiGatewayException;
+use App\Ai\Exceptions\AiProviderException;
 use Laravel\Ai\Messages\Message as LaravelAiMessage;
+use Laravel\Ai\Streaming\Events\TextDelta;
 use Throwable;
 
 use function Laravel\Ai\agent;
@@ -16,6 +18,139 @@ final class LaravelAiGateway implements ChatGateway
     public function generate(
         ChatContext $context
     ): GeneratedReply {
+        $request = $this->requestData(
+            $context
+        );
+
+        try {
+            $response = agent(
+                instructions: $context->systemPrompt,
+                messages: $request['history'],
+                tools: [],
+            )->prompt(
+                $request['prompt'],
+                provider: $request['provider'],
+                model: $request['model'],
+                timeout: $request['timeout'],
+            );
+        } catch (Throwable $exception) {
+            throw new AiProviderException(
+                'AI provider request failed.',
+                0,
+                $exception
+            );
+        }
+
+        $content = trim(
+            $response->text
+        );
+
+        if ($content === '') {
+            throw new AiProviderException(
+                'AI provider returned an empty response.'
+            );
+        }
+
+        return new GeneratedReply(
+            content: $content,
+
+            metadata: [
+                'driver' => 'laravel-ai',
+                'provider' => $request['provider'],
+                'model' => $request['model'],
+                'invocation_id' => $response->invocationId,
+                'usage' => $response->usage->toArray(),
+            ],
+
+            tokenCount: $response->usage->completionTokens,
+
+            status: 'completed',
+        );
+    }
+
+    public function stream(
+        ChatContext $context,
+        callable $onDelta
+    ): GeneratedReply {
+        $request = $this->requestData(
+            $context
+        );
+
+        try {
+            $stream = agent(
+                instructions: $context->systemPrompt,
+                messages: $request['history'],
+                tools: [],
+            )->stream(
+                $request['prompt'],
+                provider: $request['provider'],
+                model: $request['model'],
+                timeout: $request['timeout'],
+            );
+
+            foreach ($stream as $event) {
+                if (
+                    $event instanceof TextDelta
+                    && $event->delta !== ''
+                ) {
+                    $onDelta(
+                        $event->delta
+                    );
+                }
+            }
+        } catch (AiGatewayException $exception) {
+            throw $exception;
+        } catch (Throwable $exception) {
+            throw new AiProviderException(
+                'AI provider streaming request failed.',
+                0,
+                $exception
+            );
+        }
+
+        $content = trim(
+            (string) $stream->text
+        );
+
+        if ($content === '') {
+            throw new AiProviderException(
+                'AI provider returned an empty streamed response.'
+            );
+        }
+
+        $usage = $stream->usage;
+
+        return new GeneratedReply(
+            content: $content,
+
+            metadata: [
+                'driver' => 'laravel-ai',
+                'provider' => $request['provider'],
+                'model' => $request['model'],
+                'invocation_id' => $stream->invocationId,
+
+                'usage' => $usage?->toArray()
+                    ?? [],
+            ],
+
+            tokenCount: $usage?->completionTokens,
+
+            status: 'completed',
+        );
+    }
+
+    /**
+     * @return array{
+     *     provider: string,
+     *     model: string,
+     *     timeout: int,
+     *     history: list<LaravelAiMessage>,
+     *     prompt: string
+     * }
+     */
+    private function requestData(
+        ChatContext $context
+    ): array {
         $provider = trim(
             (string) config(
                 'ai.chat.provider',
@@ -38,7 +173,10 @@ final class LaravelAiGateway implements ChatGateway
             )
         );
 
-        if ($provider === '' || $model === '') {
+        if (
+            $provider === ''
+            || $model === ''
+        ) {
             throw new AiGatewayException(
                 'AI provider configuration is incomplete.'
             );
@@ -87,49 +225,12 @@ final class LaravelAiGateway implements ChatGateway
             );
         }
 
-        try {
-            $response = agent(
-                instructions: $context->systemPrompt,
-                messages: $history,
-                tools: [],
-            )->prompt(
-                $currentMessage['content'],
-                provider: $provider,
-                model: $model,
-                timeout: $timeout,
-            );
-        } catch (Throwable $exception) {
-            throw new AiGatewayException(
-                'AI provider request failed.',
-                0,
-                $exception
-            );
-        }
-
-        $content = trim(
-            $response->text
-        );
-
-        if ($content === '') {
-            throw new AiGatewayException(
-                'AI provider returned an empty response.'
-            );
-        }
-
-        return new GeneratedReply(
-            content: $content,
-
-            metadata: [
-                'driver' => 'laravel-ai',
-                'provider' => $provider,
-                'model' => $model,
-                'invocation_id' => $response->invocationId,
-                'usage' => $response->usage->toArray(),
-            ],
-
-            tokenCount: $response->usage->completionTokens,
-
-            status: 'completed',
-        );
+        return [
+            'provider' => $provider,
+            'model' => $model,
+            'timeout' => $timeout,
+            'history' => $history,
+            'prompt' => $currentMessage['content'],
+        ];
     }
 }
