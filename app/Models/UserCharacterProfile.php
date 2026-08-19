@@ -65,4 +65,9 @@ class UserCharacterProfile extends Model
     {
         return $this->hasMany(Conversation::class);
     }
+
+    public function memories(): HasMany
+    {
+        return $this->hasMany(Memory::class);
+    }
 }

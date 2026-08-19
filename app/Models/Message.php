@@ -57,6 +57,14 @@ class Message extends Model
         );
     }
 
+    public function sourceMemories(): HasMany
+    {
+        return $this->hasMany(
+            Memory::class,
+            'source_message_id'
+        );
+    }
+
     public function scopeChronological(
         Builder $query
     ): Builder {
