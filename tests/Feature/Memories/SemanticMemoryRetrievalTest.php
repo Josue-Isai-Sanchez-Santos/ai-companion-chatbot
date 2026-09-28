@@ -50,7 +50,7 @@ class SemanticMemoryRetrievalTest extends TestCase
 
         config()->set(
             'memory.minimum_similarity',
-            0.65
+            0.64
         );
 
         config()->set(
@@ -445,6 +445,67 @@ class SemanticMemoryRetrievalTest extends TestCase
             $lowImportance
                 ->fresh()
                 ->access_count
+        );
+    }
+
+    public function test_borderline_similarity_respects_adjusted_threshold(): void
+    {
+        $user = User::factory()
+            ->create();
+
+        $profile = $this->profileFor(
+            $user
+        );
+
+        $this->fakeEmbedding(
+            $this->axis(0)
+        );
+
+        $accepted = $this->memoryFor(
+            $user,
+            $profile,
+            'Memoria relevante cerca del umbral.',
+            $this->mixedVector(
+                0.645,
+                1,
+                0.7641825698
+            ),
+            0.85,
+            1.0
+        );
+
+        $rejected = $this->memoryFor(
+            $user,
+            $profile,
+            'Memoria debajo del umbral.',
+            $this->mixedVector(
+                0.635,
+                2,
+                0.7725121358
+            ),
+            0.95,
+            1.0
+        );
+
+        $results = app(
+            MemoryRetriever::class
+        )->retrieve(
+            $profile,
+            'Consulta semántica'
+        );
+
+        $this->assertSame(
+            [
+                $accepted->id,
+            ],
+            $results->modelKeys()
+        );
+
+        $this->assertFalse(
+            $results->contains(
+                'id',
+                $rejected->id
+            )
         );
     }
 

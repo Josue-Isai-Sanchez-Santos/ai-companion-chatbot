@@ -15,6 +15,13 @@
         </div>
 
         <div class="flex flex-wrap gap-2 sm:justify-end">
+            <a
+                href="{{ route('memories') }}"
+                class="rounded-lg border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-300 transition hover:bg-zinc-800"
+            >
+                Memorias
+            </a>
+
             <button
                 type="button"
                 disabled

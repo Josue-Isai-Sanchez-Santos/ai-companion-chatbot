@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\StreamMessageController;
 use App\Livewire\Chat\ChatPage;
+use App\Livewire\MemoryManager;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')
@@ -13,6 +14,11 @@ Route::middleware('auth')
             '/chat',
             ChatPage::class
         )->name('chat');
+
+        Route::livewire(
+            '/memories',
+            MemoryManager::class
+        )->name('memories');
 
         Route::post(
             '/chat/stream',

@@ -25,7 +25,7 @@ return [
 
     'minimum_similarity' => (float) env(
         'MEMORY_MINIMUM_SIMILARITY',
-        0.65
+        0.64
     ),
 
     'minimum_importance' => (float) env(

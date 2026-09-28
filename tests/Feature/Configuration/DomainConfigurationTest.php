@@ -38,7 +38,7 @@ class DomainConfigurationTest extends TestCase
         );
 
         $this->assertSame(
-            0.65,
+            0.64,
             config('memory.minimum_similarity')
         );
 
