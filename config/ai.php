@@ -1,5 +1,6 @@
 <?php
 
+use App\Ai\Gateways\LaravelAiEmbeddingGateway;
 use App\Ai\Gateways\LaravelAiGateway;
 use App\Ai\Gateways\SimulatedChatGateway;
 use App\Ai\Gateways\SimulatedEmbeddingGateway;
@@ -41,9 +42,11 @@ return [
         ),
 
         'drivers' => [
-            'simulated' => SimulatedChatGateway::class,
+            'simulated' =>
+                SimulatedChatGateway::class,
 
-            'laravel' => LaravelAiGateway::class,
+            'laravel' =>
+                LaravelAiGateway::class,
         ],
     ],
 
@@ -59,8 +62,32 @@ return [
             'simulated'
         ),
 
+        'provider' => env(
+            'AI_EMBEDDING_PROVIDER',
+            'openai'
+        ),
+
+        'model' => env(
+            'AI_EMBEDDING_MODEL',
+            'text-embedding-3-small'
+        ),
+
+        'dimensions' => (int) env(
+            'AI_EMBEDDING_DIMENSIONS',
+            1536
+        ),
+
+        'timeout' => (int) env(
+            'AI_EMBEDDING_TIMEOUT',
+            30
+        ),
+
         'drivers' => [
-            'simulated' => SimulatedEmbeddingGateway::class,
+            'simulated' =>
+                SimulatedEmbeddingGateway::class,
+
+            'laravel' =>
+                LaravelAiEmbeddingGateway::class,
         ],
     ],
 
@@ -71,6 +98,20 @@ return [
     */
 
     'providers' => [
+        'ollama' => [
+            'driver' => 'ollama',
+
+            'key' => env(
+                'OLLAMA_API_KEY',
+                ''
+            ),
+
+            'url' => env(
+                'OLLAMA_URL',
+                'http://127.0.0.1:11434'
+            ),
+        ],
+
         'openai' => [
             'driver' => 'openai',
 

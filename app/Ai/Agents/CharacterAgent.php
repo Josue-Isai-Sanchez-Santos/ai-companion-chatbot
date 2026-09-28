@@ -6,6 +6,7 @@ use App\Ai\Contracts\ChatGateway;
 use App\Ai\DTOs\CharacterContext;
 use App\Ai\DTOs\ChatContext;
 use App\Ai\DTOs\GeneratedReply;
+use App\Ai\Memory\MemoryRetriever;
 use App\Ai\Prompts\CharacterPromptBuilder;
 use App\Enums\MessageRole;
 use App\Models\Conversation;
@@ -18,6 +19,7 @@ final class CharacterAgent
     public function __construct(
         private readonly ChatGateway $chatGateway,
         private readonly CharacterPromptBuilder $promptBuilder,
+        private readonly MemoryRetriever $memoryRetriever,
     ) {}
 
     /**
@@ -101,6 +103,17 @@ final class CharacterAgent
             ->userCharacterProfile()
             ->with('character')
             ->firstOrFail();
+
+        if ($relevantMemories === []) {
+            $relevantMemories = $this
+                ->memoryRetriever
+                ->retrieve(
+                    $profile,
+                    $newMessage
+                )
+                ->pluck('content')
+                ->all();
+        }
 
         $character = $profile->character;
 
