@@ -6,6 +6,7 @@ use App\Ai\DTOs\GeneratedReply;
 use App\Enums\MessageRole;
 use App\Http\Requests\SendMessageRequest;
 use App\Jobs\ExtractConversationMemories;
+use App\Jobs\RefreshConversationSummary;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\User;
@@ -344,6 +345,19 @@ class StreamMessageAction
             )
         ) {
             ExtractConversationMemories::dispatch(
+                $message->conversation_id,
+                $message->id
+            );
+        }
+
+        if (
+            $completedNow
+            && (bool) config(
+                'chatbot.summary.enabled',
+                true
+            )
+        ) {
+            RefreshConversationSummary::dispatch(
                 $message->conversation_id,
                 $message->id
             );

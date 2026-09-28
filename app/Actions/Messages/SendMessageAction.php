@@ -7,6 +7,7 @@ use App\Ai\Exceptions\AiGatewayException;
 use App\Enums\MessageRole;
 use App\Http\Requests\SendMessageRequest;
 use App\Jobs\ExtractConversationMemories;
+use App\Jobs\RefreshConversationSummary;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\User;
@@ -157,6 +158,18 @@ class SendMessageAction
             )
         ) {
             ExtractConversationMemories::dispatch(
+                $conversation->id,
+                $assistantMessage->id
+            );
+        }
+
+        if (
+            (bool) config(
+                'chatbot.summary.enabled',
+                true
+            )
+        ) {
+            RefreshConversationSummary::dispatch(
                 $conversation->id,
                 $assistantMessage->id
             );

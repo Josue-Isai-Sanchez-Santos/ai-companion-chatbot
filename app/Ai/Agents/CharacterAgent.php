@@ -117,13 +117,26 @@ final class CharacterAgent
 
         $character = $profile->character;
 
-        $messageLimit = max(
-            1,
-            (int) config(
-                'chatbot.recent_message_limit',
-                20
-            )
+        $summary = $this->optionalText(
+            $conversation->summary
         );
+
+        $messageLimit =
+            $summary === null
+                ? max(
+                    1,
+                    (int) config(
+                        'chatbot.recent_message_limit',
+                        20
+                    )
+                )
+                : max(
+                    1,
+                    (int) config(
+                        'chatbot.summary.recent_message_limit',
+                        8
+                    )
+                );
 
         $historyLimit = max(
             0,
@@ -169,10 +182,6 @@ final class CharacterAgent
             'role' => MessageRole::User->value,
             'content' => $newMessage,
         ];
-
-        $summary = $this->optionalText(
-            $conversation->summary
-        );
 
         $relevantMemories = $this
             ->normalizeMemories(
