@@ -28,6 +28,7 @@
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="MEMORY_EXTRACTION_ENABLED" value="false"/>
         <env name="CONVERSATION_SUMMARY_ENABLED" value="false"/>
+        <env name="RELATIONSHIP_ANALYSIS_ENABLED" value="false"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>

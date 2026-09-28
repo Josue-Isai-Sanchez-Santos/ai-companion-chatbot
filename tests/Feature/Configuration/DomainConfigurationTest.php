@@ -74,5 +74,25 @@ class DomainConfigurationTest extends TestCase
                 $configuration['min']
             );
         }
+
+        foreach ([
+            'trust',
+            'affection',
+            'familiarity',
+            'tension',
+        ] as $metric) {
+            $this->assertSame(
+                3,
+                config(
+                    "relationship.max_delta_per_event.{$metric}"
+                )
+            );
+        }
+
+        $this->assertFalse(
+            (bool) config(
+                'relationship.analysis.enabled'
+            )
+        );
     }
 }

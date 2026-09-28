@@ -34,4 +34,11 @@ class Conversation extends Model
     {
         return $this->hasMany(Message::class);
     }
+
+    public function relationshipEvents(): HasMany
+    {
+        return $this->hasMany(
+            RelationshipEvent::class
+        );
+    }
 }

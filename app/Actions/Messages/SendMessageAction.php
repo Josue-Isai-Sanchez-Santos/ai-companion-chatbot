@@ -8,6 +8,7 @@ use App\Enums\MessageRole;
 use App\Http\Requests\SendMessageRequest;
 use App\Jobs\ExtractConversationMemories;
 use App\Jobs\RefreshConversationSummary;
+use App\Jobs\UpdateRelationshipState;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\User;
@@ -170,6 +171,18 @@ class SendMessageAction
             )
         ) {
             RefreshConversationSummary::dispatch(
+                $conversation->id,
+                $assistantMessage->id
+            );
+        }
+
+        if (
+            (bool) config(
+                'relationship.analysis.enabled',
+                true
+            )
+        ) {
+            UpdateRelationshipState::dispatch(
                 $conversation->id,
                 $assistantMessage->id
             );

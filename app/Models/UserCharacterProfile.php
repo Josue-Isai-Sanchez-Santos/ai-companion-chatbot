@@ -70,4 +70,11 @@ class UserCharacterProfile extends Model
     {
         return $this->hasMany(Memory::class);
     }
+
+    public function relationshipEvents(): HasMany
+    {
+        return $this->hasMany(
+            RelationshipEvent::class
+        );
+    }
 }

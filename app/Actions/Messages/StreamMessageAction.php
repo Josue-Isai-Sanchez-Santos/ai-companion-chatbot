@@ -7,6 +7,7 @@ use App\Enums\MessageRole;
 use App\Http\Requests\SendMessageRequest;
 use App\Jobs\ExtractConversationMemories;
 use App\Jobs\RefreshConversationSummary;
+use App\Jobs\UpdateRelationshipState;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\User;
@@ -358,6 +359,19 @@ class StreamMessageAction
             )
         ) {
             RefreshConversationSummary::dispatch(
+                $message->conversation_id,
+                $message->id
+            );
+        }
+
+        if (
+            $completedNow
+            && (bool) config(
+                'relationship.analysis.enabled',
+                true
+            )
+        ) {
+            UpdateRelationshipState::dispatch(
                 $message->conversation_id,
                 $message->id
             );
