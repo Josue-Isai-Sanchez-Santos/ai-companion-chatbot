@@ -6,6 +6,7 @@ use App\Ai\Agents\CharacterAgent;
 use App\Ai\Exceptions\AiGatewayException;
 use App\Enums\MessageRole;
 use App\Http\Requests\SendMessageRequest;
+use App\Jobs\ExtractConversationMemories;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\User;
@@ -148,6 +149,18 @@ class SendMessageAction
                 return $message;
             }
         );
+
+        if (
+            (bool) config(
+                'memory.extraction.enabled',
+                true
+            )
+        ) {
+            ExtractConversationMemories::dispatch(
+                $conversation->id,
+                $assistantMessage->id
+            );
+        }
 
         return [
             'user' => $userMessage,

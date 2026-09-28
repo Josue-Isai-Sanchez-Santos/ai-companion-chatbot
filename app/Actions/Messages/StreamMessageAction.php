@@ -5,6 +5,7 @@ namespace App\Actions\Messages;
 use App\Ai\DTOs\GeneratedReply;
 use App\Enums\MessageRole;
 use App\Http\Requests\SendMessageRequest;
+use App\Jobs\ExtractConversationMemories;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\User;
@@ -269,10 +270,13 @@ class StreamMessageAction
         Message $assistant,
         GeneratedReply $reply
     ): Message {
-        return DB::transaction(
+        $completedNow = false;
+
+        $message = DB::transaction(
             function () use (
                 $assistant,
-                $reply
+                $reply,
+                &$completedNow
             ): Message {
                 $message = Message::query()
                     ->whereKey($assistant->id)
@@ -326,9 +330,26 @@ class StreamMessageAction
                         'last_message_at' => now(),
                     ]);
 
+                $completedNow = true;
+
                 return $message->fresh();
             }
         );
+
+        if (
+            $completedNow
+            && (bool) config(
+                'memory.extraction.enabled',
+                true
+            )
+        ) {
+            ExtractConversationMemories::dispatch(
+                $message->conversation_id,
+                $message->id
+            );
+        }
+
+        return $message;
     }
 
     public function fail(
