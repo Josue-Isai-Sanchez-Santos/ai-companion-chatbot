@@ -547,4 +547,262 @@ class AutomaticMemoryExtractionTest extends TestCase
             0
         );
     }
+
+    public function test_transient_user_state_is_not_stored_as_memory(): void
+    {
+        $user = User::factory()
+            ->create();
+
+        $profile = $this->profileFor(
+            $user
+        );
+
+        $conversation = $profile
+            ->conversations()
+            ->create([
+                'title' =>
+                    'Transient state',
+            ]);
+
+        $userMessage = $conversation
+            ->messages()
+            ->create([
+                'role' =>
+                    MessageRole::User,
+
+                'content' =>
+                    'Hoy estoy cansado porque dormí poco.',
+
+                'status' =>
+                    Message::STATUS_COMPLETED,
+            ]);
+
+        $assistantMessage = $conversation
+            ->messages()
+            ->create([
+                'parent_message_id' =>
+                    $userMessage->id,
+
+                'role' =>
+                    MessageRole::Assistant,
+
+                'content' =>
+                    'Espero que puedas descansar.',
+
+                'status' =>
+                    Message::STATUS_COMPLETED,
+            ]);
+
+        $fakeEmbedding =
+            $this->fakeEmbedding();
+
+        MemoryExtractionAgent::fake([
+            [
+                'memories' => [
+                    [
+                        'type' =>
+                            MemoryType::UserFact->value,
+
+                        'content' =>
+                            'El usuario está cansado porque durmió poco.',
+
+                        'importance' =>
+                            0.7,
+
+                        'confidence' =>
+                            0.9,
+
+                        'source_message_id' =>
+                            $userMessage->id,
+                    ],
+                ],
+            ],
+        ]);
+
+        $job =
+            new ExtractConversationMemories(
+                $conversation->id,
+                $assistantMessage->id
+            );
+
+        $job->handle(
+            app(
+                MemoryExtractor::class
+            )
+        );
+
+        $this->assertDatabaseCount(
+            'memories',
+            0
+        );
+
+        $this->assertSame(
+            [],
+            $fakeEmbedding->inputs
+        );
+    }
+
+    public function test_assistant_suggestion_is_not_stored_as_shared_event(): void
+    {
+        $user = User::factory()
+            ->create();
+
+        $profile = $this->profileFor(
+            $user
+        );
+
+        $conversation = $profile
+            ->conversations()
+            ->create([
+                'title' =>
+                    'Suggestion test',
+            ]);
+
+        $userMessage = $conversation
+            ->messages()
+            ->create([
+                'role' =>
+                    MessageRole::User,
+
+                'content' =>
+                    'Mi comida favorita es el sushi.',
+
+                'status' =>
+                    Message::STATUS_COMPLETED,
+            ]);
+
+        $assistantMessage = $conversation
+            ->messages()
+            ->create([
+                'parent_message_id' =>
+                    $userMessage->id,
+
+                'role' =>
+                    MessageRole::Assistant,
+
+                'content' =>
+                    'Quizás algún día podríamos hablar '
+                    .'sobre preparar sushi en Pachuca.',
+
+                'status' =>
+                    Message::STATUS_COMPLETED,
+            ]);
+
+        $fakeEmbedding =
+            $this->fakeEmbedding();
+
+        MemoryExtractionAgent::fake([
+            [
+                'memories' => [
+                    [
+                        'type' =>
+                            MemoryType::SharedEvent->value,
+
+                        'content' =>
+                            'El asistente quiere hablar sobre '
+                            .'preparar sushi en Pachuca.',
+
+                        'importance' =>
+                            0.7,
+
+                        'confidence' =>
+                            0.9,
+
+                        'source_message_id' =>
+                            $assistantMessage->id,
+                    ],
+                ],
+            ],
+        ]);
+
+        $job =
+            new ExtractConversationMemories(
+                $conversation->id,
+                $assistantMessage->id
+            );
+
+        $job->handle(
+            app(
+                MemoryExtractor::class
+            )
+        );
+
+        $this->assertDatabaseCount(
+            'memories',
+            0
+        );
+
+        $this->assertSame(
+            [],
+            $fakeEmbedding->inputs
+        );
+    }
+
+
+    public function test_obvious_preference_is_normalized_from_user_fact(): void
+    {
+        $user = User::factory()
+            ->create();
+
+        $profile = $this->profileFor(
+            $user
+        );
+
+        [
+            $userMessage,
+            $assistantMessage,
+        ] = $this->completedTurn(
+            $profile
+        );
+
+        $this->fakeEmbedding();
+
+        MemoryExtractionAgent::fake([
+            [
+                'memories' => [
+                    [
+                        'type' =>
+                            MemoryType::UserFact->value,
+
+                        'content' =>
+                            'La comida favorita del usuario es el sushi.',
+
+                        'importance' =>
+                            0.8,
+
+                        'confidence' =>
+                            1.0,
+
+                        'source_message_id' =>
+                            $userMessage->id,
+                    ],
+                ],
+            ],
+        ]);
+
+        $job =
+            new ExtractConversationMemories(
+                $assistantMessage
+                    ->conversation_id,
+
+                $assistantMessage
+                    ->id
+            );
+
+        $job->handle(
+            app(
+                MemoryExtractor::class
+            )
+        );
+
+        $memory = $profile
+            ->memories()
+            ->firstOrFail();
+
+        $this->assertSame(
+            MemoryType::UserPreference,
+            $memory->type
+        );
+    }
+
 }

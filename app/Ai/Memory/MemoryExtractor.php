@@ -4,6 +4,7 @@ namespace App\Ai\Memory;
 
 use App\Actions\Memories\CreateMemoryAction;
 use App\Ai\Contracts\EmbeddingGateway;
+use App\Enums\MemoryType;
 use App\Enums\MessageRole;
 use App\Models\Conversation;
 use App\Models\Memory;
@@ -101,6 +102,14 @@ final class MemoryExtractor
         if ($messages->count() < 2) {
             return [];
         }
+
+        $messagesById = $messages
+            ->keyBy(
+                static fn (
+                    Message $message
+                ): int =>
+                    $message->id
+            );
 
         $response = $this
             ->agent
@@ -212,11 +221,26 @@ final class MemoryExtractor
                 continue;
             }
 
+            $candidate =
+                $this->normalizeCandidateType(
+                    $candidate,
+                    $messagesById
+                );
+
             if (
                 $candidate->importance
                     < $minimumImportance
                 || $candidate->confidence
                     < $minimumConfidence
+            ) {
+                continue;
+            }
+
+            if (
+                $this->shouldRejectCandidate(
+                    $candidate,
+                    $messagesById
+                )
             ) {
                 continue;
             }
@@ -484,6 +508,281 @@ final class MemoryExtractor
                     );
             }
         );
+    }
+
+    /**
+     * Reject obvious false-positive memories even when
+     * the extraction model proposes them.
+     *
+     * @param  Collection<int, Message>  $messagesById
+     */
+    /**
+     * Correct obvious type mistakes from a small
+     * local extraction model.
+     *
+     * @param  Collection<int, Message>  $messagesById
+     */
+    private function normalizeCandidateType(
+        ExtractedMemory $candidate,
+        Collection $messagesById
+    ): ExtractedMemory {
+        if (
+            $candidate->type
+                !== MemoryType::UserFact
+            || $candidate->sourceMessageId
+                === null
+        ) {
+            return $candidate;
+        }
+
+        $sourceMessage = $messagesById
+            ->get(
+                $candidate->sourceMessageId
+            );
+
+        if (
+            ! $sourceMessage
+                instanceof Message
+            || $sourceMessage->role
+                !== MessageRole::User
+        ) {
+            return $candidate;
+        }
+
+        if (
+            ! $this->containsPreferenceCue(
+                $sourceMessage->content
+            )
+        ) {
+            return $candidate;
+        }
+
+        return new ExtractedMemory(
+            type:
+                MemoryType::UserPreference,
+
+            content:
+                $candidate->content,
+
+            importance:
+                $candidate->importance,
+
+            confidence:
+                $candidate->confidence,
+
+            sourceMessageId:
+                $candidate->sourceMessageId,
+        );
+    }
+
+    private function containsPreferenceCue(
+        string $content
+    ): bool {
+        $content = mb_strtolower(
+            $content
+        );
+
+        return preg_match(
+            '/\b('
+                .'favorito'
+                .'|favorita'
+                .'|favoritos'
+                .'|favoritas'
+                .'|prefiero'
+                .'|preferir'
+                .'|me gusta'
+                .'|me gustan'
+                .'|me encanta'
+                .'|me encantan'
+                .'|favorite'
+                .'|favourite'
+                .'|prefer'
+                .'|like'
+                .'|love'
+            .')\b/u',
+            $content
+        ) === 1;
+    }
+
+    private function shouldRejectCandidate(
+        ExtractedMemory $candidate,
+        Collection $messagesById
+    ): bool {
+        $requiresUserSource = in_array(
+            $candidate->type,
+            [
+                MemoryType::UserFact,
+                MemoryType::UserPreference,
+                MemoryType::SharedEvent,
+            ],
+            true
+        );
+
+        if (
+            $candidate->sourceMessageId
+            === null
+        ) {
+            return $requiresUserSource;
+        }
+
+        $sourceMessage = $messagesById
+            ->get(
+                $candidate->sourceMessageId
+            );
+
+        if (
+            ! $sourceMessage
+                instanceof Message
+        ) {
+            return $requiresUserSource;
+        }
+
+        /*
+         * Facts/preferences about the user and
+         * shared events must come from the user,
+         * not from an assistant inference.
+         */
+        if (
+            $requiresUserSource
+            && $sourceMessage->role
+                !== MessageRole::User
+        ) {
+            return true;
+        }
+
+        /*
+         * Statements explicitly scoped to the
+         * present moment are not long-term memory.
+         */
+        if (
+            in_array(
+                $candidate->type,
+                [
+                    MemoryType::UserFact,
+                    MemoryType::UserPreference,
+                ],
+                true
+            )
+            && $this->containsTransientCue(
+                $sourceMessage->content
+            )
+        ) {
+            return true;
+        }
+
+        /*
+         * A hypothetical suggestion is not an event
+         * that has actually happened.
+         */
+        if (
+            $candidate->type
+                === MemoryType::SharedEvent
+            && $this->containsHypotheticalCue(
+                $sourceMessage->content
+            )
+        ) {
+            return true;
+        }
+
+        /*
+         * Ordinary character introductions already
+         * exist in the character configuration.
+         */
+        if (
+            $candidate->type
+                === MemoryType::CharacterFact
+            && $sourceMessage->role
+                === MessageRole::Assistant
+            && $this->looksLikeGenericIntroduction(
+                $sourceMessage->content
+            )
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function containsTransientCue(
+        string $content
+    ): bool {
+        $content = mb_strtolower(
+            $content
+        );
+
+        return preg_match(
+            '/\b('
+                .'hoy'
+                .'|ahora'
+                .'|ahorita'
+                .'|por ahora'
+                .'|en este momento'
+                .'|esta mañana'
+                .'|esta tarde'
+                .'|esta noche'
+                .'|momentáneamente'
+                .'|temporalmente'
+                .'|today'
+                .'|right now'
+                .'|currently'
+                .'|for now'
+                .'|at the moment'
+                .'|this morning'
+                .'|this afternoon'
+                .'|tonight'
+            .')\b/u',
+            $content
+        ) === 1;
+    }
+
+    private function containsHypotheticalCue(
+        string $content
+    ): bool {
+        $content = mb_strtolower(
+            $content
+        );
+
+        return preg_match(
+            '/\b('
+                .'quizás'
+                .'|quiza'
+                .'|quizá'
+                .'|tal vez'
+                .'|podríamos'
+                .'|podriamos'
+                .'|podría'
+                .'|podria'
+                .'|algún día'
+                .'|algun dia'
+                .'|maybe'
+                .'|perhaps'
+                .'|could'
+                .'|might'
+                .'|someday'
+            .')\b/u',
+            $content
+        ) === 1;
+    }
+
+    private function looksLikeGenericIntroduction(
+        string $content
+    ): bool {
+        $content = mb_strtolower(
+            $content
+        );
+
+        return preg_match(
+            '/('
+                .'me llamo'
+                .'|mi nombre es'
+                .'|soy tu compañero'
+                .'|soy tu compañera'
+                .'|my name is'
+                .'|i am your companion'
+                ."|i'm your companion"
+            .')/u',
+            $content
+        ) === 1;
     }
 
     private function fingerprint(
