@@ -43,9 +43,9 @@
     <div class="grid gap-4 lg:grid-cols-[16rem_minmax(0,1fr)]">
         <aside class="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
             <div class="flex aspect-square w-full items-center justify-center overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950">
-                @if ($character->avatar_path)
+                @if ($portraitPath)
                     <img
-                        src="{{ asset('storage/' . $character->avatar_path) }}"
+                        src="{{ asset('storage/' . $portraitPath) }}"
                         alt="Avatar de {{ $character->name }}"
                         class="h-full w-full object-cover"
                     >

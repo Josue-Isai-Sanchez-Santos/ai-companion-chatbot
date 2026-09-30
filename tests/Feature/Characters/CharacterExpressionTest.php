@@ -102,6 +102,7 @@ class CharacterExpressionTest extends TestCase
         $this->assertSame(
             [
                 'angry',
+                'curious',
                 'embarrassed',
                 'happy',
                 'neutral',
@@ -116,7 +117,7 @@ class CharacterExpressionTest extends TestCase
         );
 
         $this->assertCount(
-            6,
+            7,
             $character->expressions
         );
 
@@ -143,7 +144,7 @@ class CharacterExpressionTest extends TestCase
             ->firstOrFail();
 
         $this->assertSame(
-            6,
+            7,
             $character->expressions()->count()
         );
 

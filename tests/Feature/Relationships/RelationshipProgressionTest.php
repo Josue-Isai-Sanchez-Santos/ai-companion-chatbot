@@ -611,6 +611,9 @@ class RelationshipProgressionTest extends TestCase
             ),
             app(
                 RelationshipUpdater::class
+            ),
+            app(
+                \App\Ai\State\CharacterStateResolver::class
             )
         );
 
@@ -755,4 +758,81 @@ class RelationshipProgressionTest extends TestCase
                     === $completed->id
         );
     }
+
+    public function test_relationship_job_updates_character_emotional_state(): void
+    {
+        $user = User::factory()
+            ->create();
+
+        $profile =
+            $this->profileFor(
+                $user
+            );
+
+        [
+            $conversation,
+            ,
+            $assistantMessage,
+        ] = $this->completedTurn(
+            $profile
+        );
+
+        RelationshipAnalysisAgent::fake([
+            [
+                'significant' =>
+                    true,
+
+                'event_summary' =>
+                    'El usuario fortaleció la confianza.',
+
+                'trust_delta' =>
+                    3,
+
+                'affection_delta' =>
+                    2,
+
+                'familiarity_delta' =>
+                    1,
+
+                'tension_delta' =>
+                    0,
+            ],
+        ]);
+
+        $job =
+            new UpdateRelationshipState(
+                $conversation->id,
+                $assistantMessage->id
+            );
+
+        $job->handle(
+            app(
+                RelationshipAnalysisAgent::class
+            ),
+            app(
+                RelationshipPromptBuilder::class
+            ),
+            app(
+                RelationshipUpdater::class
+            ),
+            app(
+                \App\Ai\State\CharacterStateResolver::class
+            )
+        );
+
+        $profile->refresh();
+
+        $this->assertSame(
+            \App\Enums\CharacterMood::Happy,
+            $profile->current_mood
+        );
+
+        $this->assertSame(
+            'happy',
+            $profile
+                ->currentExpression
+                ->name
+        );
+    }
+
 }

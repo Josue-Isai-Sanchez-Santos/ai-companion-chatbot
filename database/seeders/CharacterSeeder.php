@@ -95,6 +95,11 @@ class CharacterSeeder extends Seeder
                     'description' => 'Expresión de sorpresa.',
                     'is_default' => false,
                 ],
+                [
+                    'name' => CharacterMood::Curious->value,
+                    'description' => 'Expresión de curiosidad e interés.',
+                    'is_default' => false,
+                ],
             ];
 
             foreach ($expressions as $expression) {

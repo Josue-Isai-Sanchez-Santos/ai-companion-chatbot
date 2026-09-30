@@ -6,6 +6,7 @@ use App\Ai\Agents\RelationshipAnalysisAgent;
 use App\Ai\Prompts\RelationshipPromptBuilder;
 use App\Ai\Relationship\RelationshipChange;
 use App\Ai\Relationship\RelationshipUpdater;
+use App\Ai\State\CharacterStateResolver;
 use App\Enums\MessageRole;
 use App\Models\Conversation;
 use App\Models\Message;
@@ -66,7 +67,8 @@ final class UpdateRelationshipState implements
     public function handle(
         RelationshipAnalysisAgent $agent,
         RelationshipPromptBuilder $promptBuilder,
-        RelationshipUpdater $updater
+        RelationshipUpdater $updater,
+        CharacterStateResolver $stateResolver
     ): void {
         if (
             ! (bool) config(
@@ -222,12 +224,22 @@ final class UpdateRelationshipState implements
                     ?? 0,
             ]);
 
-        $updater->apply(
+        $event = $updater->apply(
             $profile,
             $conversation,
             $userMessage,
             $assistant,
             $change
+        );
+
+        /*
+         * Emotional state is resolved only after the
+         * backend has validated and applied the
+         * relationship proposal.
+         */
+        $stateResolver->apply(
+            $profile->fresh(),
+            $event
         );
     }
 

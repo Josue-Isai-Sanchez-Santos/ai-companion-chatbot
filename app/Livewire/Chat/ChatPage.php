@@ -241,6 +241,10 @@ class ChatPage extends Component
             'conversations' => $conversations,
             'selectedConversation' => $selectedConversation,
 
+            'portraitPath' =>
+                $profile->currentExpression?->image_path
+                ?: $profile->character->avatar_path,
+
             'moodLabel' => $this->moodLabel(
                 $profile->current_mood
             ),
@@ -325,6 +329,7 @@ class ChatPage extends Component
             'embarrassed' => 'Vergüenza',
             'sad' => 'Triste',
             'surprised' => 'Sorpresa',
+            'curious' => 'Curiosidad',
             default => 'Sin expresión',
         };
     }
