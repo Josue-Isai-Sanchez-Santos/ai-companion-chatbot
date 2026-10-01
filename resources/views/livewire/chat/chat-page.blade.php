@@ -1,4 +1,15 @@
 <section class="mx-auto w-full max-w-7xl">
+    @if (session('status'))
+        <div class="mb-4 rounded-xl border border-emerald-900/70 bg-emerald-950/30 px-4 py-3 text-sm text-emerald-300">
+            {{ session('status') }}
+        </div>
+    @endif
+
+    @if (session('warning'))
+        <div class="mb-4 rounded-xl border border-amber-900/70 bg-amber-950/30 px-4 py-3 text-sm text-amber-300">
+            {{ session('warning') }}
+        </div>
+    @endif
     <div class="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div class="min-w-0">
             <p class="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">
@@ -30,13 +41,10 @@
                 Configuración
             </button>
 
-            <button
-                type="button"
-                disabled
-                class="cursor-not-allowed rounded-lg border border-red-900/70 px-4 py-2 text-sm font-medium text-red-400 opacity-70"
-            >
-                Restablecer personaje
-            </button>
+            <livewire:reset-character-modal
+                :profile-id="$profile->id"
+                :key="'reset-character-'.$profile->id"
+            />
         </div>
     </div>
 

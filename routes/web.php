@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ResetCharacterController;
 use App\Http\Controllers\StreamMessageController;
 use App\Livewire\Chat\ChatPage;
 use App\Livewire\MemoryManager;
@@ -19,6 +20,11 @@ Route::middleware('auth')
             '/memories',
             MemoryManager::class
         )->name('memories');
+
+        Route::post(
+            '/character/reset',
+            ResetCharacterController::class
+        )->name('character.reset');
 
         Route::post(
             '/chat/stream',
