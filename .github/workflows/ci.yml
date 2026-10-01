@@ -1,0 +1,147 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  application-checks:
+    name: Application checks
+
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 20
+
+    services:
+      postgres:
+        image: pgvector/pgvector:0.8.5-pg18-bookworm
+
+        env:
+          POSTGRES_DB: ai_companion_testing
+          POSTGRES_USER: ai_companion
+          POSTGRES_PASSWORD: ci_password
+
+        ports:
+          - 5432:5432
+
+        options: >-
+          --health-cmd
+          "pg_isready -U ai_companion -d ai_companion_testing"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      APP_ENV: testing
+      APP_DEBUG: false
+
+      DB_CONNECTION: pgsql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5432
+      DB_DATABASE: ai_companion_testing
+      DB_USERNAME: ai_companion
+      DB_PASSWORD: ci_password
+
+      CACHE_STORE: array
+      SESSION_DRIVER: array
+      QUEUE_CONNECTION: sync
+
+      MEMORY_EXTRACTION_ENABLED: false
+      CONVERSATION_SUMMARY_ENABLED: false
+      RELATIONSHIP_ANALYSIS_ENABLED: false
+
+      AI_CHAT_DRIVER: simulated
+      AI_EMBEDDING_DRIVER: simulated
+
+      OPENAI_API_KEY: ""
+      OLLAMA_API_KEY: ""
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: >-
+            mbstring,
+            intl,
+            pdo_pgsql,
+            pgsql
+          coverage: none
+          tools: composer:v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Validate Composer configuration
+        run: composer validate --strict
+
+      - name: Install PHP dependencies
+        run: >-
+          composer install
+          --no-interaction
+          --prefer-dist
+          --no-progress
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Prepare testing environment
+        run: |
+          cp .env.testing.example .env.testing
+          php artisan key:generate --env=testing
+
+      - name: Check changed PHP style
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            BASE="${{ github.event.pull_request.base.sha }}"
+          else
+            BASE="${{ github.event.before }}"
+          fi
+
+          if [[ -z "$BASE" || "$BASE" =~ ^0+$ ]]; then
+            BASE="$(git mktree </dev/null)"
+          fi
+
+          mapfile -t PHP_FILES < <(
+            git diff               --name-only               --diff-filter=ACMRT               "$BASE"               "${{ github.sha }}"               -- '*.php'
+          )
+
+          if (( ${#PHP_FILES[@]} == 0 )); then
+            echo "No changed PHP files to check."
+            exit 0
+          fi
+
+          echo "PHP files checked by Pint:"
+          printf ' - %s\n' "${PHP_FILES[@]}"
+
+          vendor/bin/pint --test "${PHP_FILES[@]}"
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Run database migrations
+        run: php artisan migrate:fresh --env=testing --force
+
+      - name: Run automated tests
+        run: php artisan test
