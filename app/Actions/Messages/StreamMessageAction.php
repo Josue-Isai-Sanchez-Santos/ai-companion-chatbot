@@ -61,6 +61,7 @@ class StreamMessageAction
 
                 $parentMessageId = $lockedConversation
                     ->messages()
+                    ->activeBranch()
                     ->latest('created_at')
                     ->latest('id')
                     ->value('id');
@@ -78,6 +79,8 @@ class StreamMessageAction
                         'token_count' => null,
 
                         'status' => Message::STATUS_COMPLETED,
+
+                        'is_active_branch' => true,
                     ]);
 
                 $assistantMessage = $lockedConversation
@@ -101,6 +104,8 @@ class StreamMessageAction
                         'token_count' => null,
 
                         'status' => Message::STATUS_STREAMING,
+
+                        'is_active_branch' => true,
                     ]);
 
                 $lockedConversation->forceFill([
@@ -164,6 +169,8 @@ class StreamMessageAction
                         !== $lockedConversation->id
                     || $lockedAssistant->role
                         !== MessageRole::Assistant
+                    || ! $lockedAssistant
+                        ->is_active_branch
                     || ! in_array(
                         $lockedAssistant->status,
                         [
@@ -488,6 +495,7 @@ class StreamMessageAction
     ): void {
         $query = $conversation
             ->messages()
+            ->activeBranch()
             ->where(
                 'role',
                 MessageRole::Assistant->value

@@ -25,6 +25,7 @@ class Message extends Model
         'metadata',
         'token_count',
         'status',
+        'is_active_branch',
     ];
 
     protected function casts(): array
@@ -33,6 +34,7 @@ class Message extends Model
             'role' => MessageRole::class,
             'metadata' => 'array',
             'token_count' => 'integer',
+            'is_active_branch' => 'boolean',
         ];
     }
 
@@ -62,6 +64,15 @@ class Message extends Model
         return $this->hasMany(
             Memory::class,
             'source_message_id'
+        );
+    }
+
+    public function scopeActiveBranch(
+        Builder $query
+    ): Builder {
+        return $query->where(
+            'is_active_branch',
+            true
         );
     }
 

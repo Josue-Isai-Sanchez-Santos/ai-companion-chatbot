@@ -95,6 +95,7 @@ final class UpdateRelationshipState implements
         $assistant =
             $conversation
                 ->messages()
+                ->activeBranch()
                 ->whereKey(
                     $this->assistantMessageId
                 )
@@ -129,6 +130,7 @@ final class UpdateRelationshipState implements
         $userMessage =
             $conversation
                 ->messages()
+                ->activeBranch()
                 ->whereKey(
                     $assistant
                         ->parent_message_id

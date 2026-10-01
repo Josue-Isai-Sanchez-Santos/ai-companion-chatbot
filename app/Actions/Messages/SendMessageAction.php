@@ -58,6 +58,7 @@ class SendMessageAction
             ): Message {
                 $parentMessageId = $conversation
                     ->messages()
+                    ->activeBranch()
                     ->latest('created_at')
                     ->latest('id')
                     ->value('id');
@@ -75,6 +76,8 @@ class SendMessageAction
                         'token_count' => null,
 
                         'status' => Message::STATUS_COMPLETED,
+
+                        'is_active_branch' => true,
                     ]);
 
                 $conversation->forceFill([
@@ -136,6 +139,8 @@ class SendMessageAction
                         'token_count' => $reply->tokenCount,
 
                         'status' => $reply->status,
+
+                        'is_active_branch' => true,
                     ]);
 
                 $conversation->forceFill([

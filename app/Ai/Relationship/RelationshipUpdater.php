@@ -47,18 +47,6 @@ final class RelationshipUpdater
             $assistantMessage
         );
 
-        $existing =
-            RelationshipEvent::query()
-                ->where(
-                    'assistant_message_id',
-                    $assistantMessage->id
-                )
-                ->first();
-
-        if ($existing !== null) {
-            return $existing;
-        }
-
         return DB::transaction(
             function () use (
                 $profile,
@@ -74,6 +62,52 @@ final class RelationshipUpdater
                         )
                         ->lockForUpdate()
                         ->firstOrFail();
+
+                /*
+                 * The analysis model may have started
+                 * before a regeneration changed the
+                 * selected branch. Re-read the turn
+                 * from the database before applying
+                 * any relationship effect.
+                 */
+                $assistantStillActive =
+                    Message::query()
+                        ->whereKey(
+                            $assistantMessage->id
+                        )
+                        ->where(
+                            'conversation_id',
+                            $conversation->id
+                        )
+                        ->activeBranch()
+                        ->where(
+                            'status',
+                            Message::STATUS_COMPLETED
+                        )
+                        ->exists();
+
+                $userStillActive =
+                    Message::query()
+                        ->whereKey(
+                            $userMessage->id
+                        )
+                        ->where(
+                            'conversation_id',
+                            $conversation->id
+                        )
+                        ->activeBranch()
+                        ->where(
+                            'status',
+                            Message::STATUS_COMPLETED
+                        )
+                        ->exists();
+
+                if (
+                    ! $assistantStillActive
+                    || ! $userStillActive
+                ) {
+                    return null;
+                }
 
                 $existing =
                     RelationshipEvent::query()

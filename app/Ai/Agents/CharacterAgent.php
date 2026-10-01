@@ -91,6 +91,7 @@ final class CharacterAgent
                     !== $conversation->id
                 || $persistedMessage->role
                     !== MessageRole::User
+                || ! $persistedMessage->is_active_branch
                 || $persistedMessage->content
                     !== $newMessage
             ) {
@@ -147,7 +148,8 @@ final class CharacterAgent
 
         if ($historyLimit > 0) {
             $query = $conversation
-                ->messages();
+                ->messages()
+                ->activeBranch();
 
             if ($persistedMessage !== null) {
                 $query->where(

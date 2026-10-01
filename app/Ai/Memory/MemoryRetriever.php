@@ -6,6 +6,7 @@ use App\Ai\Contracts\EmbeddingGateway;
 use App\Ai\Exceptions\AiGatewayException;
 use App\Models\Memory;
 use App\Models\UserCharacterProfile;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use LogicException;
@@ -91,6 +92,25 @@ final class MemoryRetriever
                 'importance',
                 '>=',
                 $minimumImportance
+            )
+            ->where(
+                function (
+                    Builder $query
+                ): void {
+                    $query
+                        ->whereNull(
+                            'source_message_id'
+                        )
+                        ->orWhereHas(
+                            'sourceMessage',
+                            function (
+                                Builder $query
+                            ): void {
+                                $query
+                                    ->activeBranch();
+                            }
+                        );
+                }
             );
 
         /*

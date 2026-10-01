@@ -90,6 +90,7 @@ final class RefreshConversationSummary implements
 
         $anchor = $conversation
             ->messages()
+            ->activeBranch()
             ->whereKey(
                 $this->throughMessageId
             )
@@ -117,6 +118,7 @@ final class RefreshConversationSummary implements
 
         $query = $conversation
             ->messages()
+            ->activeBranch()
             ->where(
                 'id',
                 '<=',
@@ -271,6 +273,17 @@ final class RefreshConversationSummary implements
             $maxCharacters
         );
 
+        $coveredMessageIds =
+            $messages
+                ->pluck('id')
+                ->map(
+                    static fn (
+                        mixed $id
+                    ): int =>
+                        (int) $id
+                )
+                ->all();
+
         $coveredThrough =
             $messages->last();
 
@@ -284,7 +297,8 @@ final class RefreshConversationSummary implements
         DB::transaction(
             function () use (
                 $summary,
-                $coveredThrough
+                $coveredThrough,
+                $coveredMessageIds
             ): void {
                 $conversation =
                     Conversation::query()
@@ -295,6 +309,33 @@ final class RefreshConversationSummary implements
                         ->first();
 
                 if ($conversation === null) {
+                    return;
+                }
+
+                /*
+                 * A regeneration may have changed
+                 * branches while the summarizer was
+                 * talking to the AI provider.
+                 */
+                $stillActive =
+                    Message::query()
+                        ->where(
+                            'conversation_id',
+                            $this->conversationId
+                        )
+                        ->activeBranch()
+                        ->whereIn(
+                            'id',
+                            $coveredMessageIds
+                        )
+                        ->count();
+
+                if (
+                    $stillActive
+                    !== count(
+                        $coveredMessageIds
+                    )
+                ) {
                     return;
                 }
 

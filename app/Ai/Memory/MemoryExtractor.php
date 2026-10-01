@@ -43,6 +43,7 @@ final class MemoryExtractor
 
         $anchor = $conversation
             ->messages()
+            ->activeBranch()
             ->whereKey(
                 $throughMessageId
             )
@@ -77,6 +78,7 @@ final class MemoryExtractor
 
         $messages = $conversation
             ->messages()
+            ->activeBranch()
             ->where(
                 'id',
                 '<=',
@@ -138,6 +140,22 @@ final class MemoryExtractor
             throw new LogicException(
                 'Memory extraction agent did not return structured output.'
             );
+        }
+
+        /*
+         * The branch may have changed while the
+         * extraction model was running.
+         */
+        if (
+            ! $conversation
+                ->messages()
+                ->activeBranch()
+                ->whereKey(
+                    $anchor->id
+                )
+                ->exists()
+        ) {
+            return [];
         }
 
         $rawMemories =

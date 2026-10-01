@@ -3,6 +3,14 @@
     data-chat-message-list
     data-conversation-id="{{ $conversationId }}"
 >
+    @error('regeneration')
+        <div
+            class="rounded-xl border border-red-900/70 bg-red-950/30 px-4 py-3 text-sm text-red-300"
+        >
+            {{ $message }}
+        </div>
+    @enderror
+
     @forelse ($messages as $message)
         @php
             $isUser = $message->role === \App\Enums\MessageRole::User;
@@ -97,6 +105,48 @@
                             </button>
                         </div>
                     @endif
+                @endif
+
+                @if (
+                    ! $isUser
+                    && $message->status === \App\Models\Message::STATUS_COMPLETED
+                    && $message->id === $latestCompletedAssistantId
+                )
+                    <div class="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-zinc-800 pt-3">
+                        @if ($latestAssistantAlternativeCount > 1)
+                            <span class="text-[11px] text-zinc-500">
+                                Rama seleccionada ·
+                                {{ $latestAssistantAlternativeCount }}
+                                alternativas
+                            </span>
+                        @else
+                            <span class="text-[11px] text-zinc-600">
+                                Rama seleccionada
+                            </span>
+                        @endif
+
+                        <button
+                            type="button"
+                            wire:click="regenerate({{ $message->id }})"
+                            wire:loading.attr="disabled"
+                            wire:target="regenerate({{ $message->id }})"
+                            class="rounded-lg border border-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-300 transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                            <span
+                                wire:loading.remove
+                                wire:target="regenerate({{ $message->id }})"
+                            >
+                                Regenerar
+                            </span>
+
+                            <span
+                                wire:loading
+                                wire:target="regenerate({{ $message->id }})"
+                            >
+                                Regenerando…
+                            </span>
+                        </button>
+                    </div>
                 @endif
 
                 <p class="mt-2 text-right text-[11px] text-zinc-600">
