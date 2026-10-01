@@ -5,6 +5,7 @@ namespace App\Actions\Messages;
 use App\Ai\Agents\CharacterAgent;
 use App\Ai\DTOs\GeneratedReply;
 use App\Ai\Exceptions\AiGatewayException;
+use App\Ai\Safety\ChatSafetyPolicy;
 use App\Ai\State\CharacterStateResolver;
 use App\Enums\MessageRole;
 use App\Models\Conversation;
@@ -23,6 +24,7 @@ final class RegenerateMessageAction
     public function __construct(
         private readonly CharacterAgent $characterAgent,
         private readonly CharacterStateResolver $stateResolver,
+        private readonly ChatSafetyPolicy $chatSafetyPolicy,
     ) {}
 
     /**
@@ -45,6 +47,12 @@ final class RegenerateMessageAction
             'update',
             $conversation
         );
+
+        $this
+            ->chatSafetyPolicy
+            ->assertGenerationAllowed(
+                $user
+            );
 
         $preparation =
             $this->prepare(

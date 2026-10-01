@@ -8,6 +8,7 @@ use App\Ai\DTOs\ChatContext;
 use App\Ai\DTOs\GeneratedReply;
 use App\Ai\Memory\MemoryRetriever;
 use App\Ai\Prompts\CharacterPromptBuilder;
+use App\Ai\Safety\OutputValidator;
 use App\Enums\MessageRole;
 use App\Models\Conversation;
 use App\Models\Message;
@@ -20,6 +21,7 @@ final class CharacterAgent
         private readonly ChatGateway $chatGateway,
         private readonly CharacterPromptBuilder $promptBuilder,
         private readonly MemoryRetriever $memoryRetriever,
+        private readonly OutputValidator $outputValidator,
     ) {}
 
     /**
@@ -40,9 +42,18 @@ final class CharacterAgent
             $persistedMessage
         );
 
-        return $this->chatGateway->generate(
-            $context
-        );
+        $reply =
+            $this
+                ->chatGateway
+                ->generate(
+                    $context
+                );
+
+        return $this
+            ->outputValidator
+            ->validate(
+                $reply
+            );
     }
 
     /**
@@ -65,10 +76,48 @@ final class CharacterAgent
             $persistedMessage
         );
 
-        return $this->chatGateway->stream(
-            $context,
-            $onDelta
-        );
+        $buffer = '';
+
+        $reply =
+            $this
+                ->chatGateway
+                ->stream(
+                    $context,
+
+                    function (
+                        string $delta
+                    ) use (
+                        &$buffer,
+                        $onDelta
+                    ): void {
+                        $candidate =
+                            $buffer
+                            .$delta;
+
+                        /*
+                         * Validate before forwarding
+                         * this delta to the client.
+                         */
+                        $this
+                            ->outputValidator
+                            ->assertSafePartial(
+                                $candidate
+                            );
+
+                        $buffer =
+                            $candidate;
+
+                        $onDelta(
+                            $delta
+                        );
+                    }
+                );
+
+        return $this
+            ->outputValidator
+            ->validate(
+                $reply
+            );
     }
 
     /**

@@ -3,8 +3,9 @@
 namespace App\Actions\Messages;
 
 use App\Ai\DTOs\GeneratedReply;
+use App\Ai\Safety\ChatSafetyPolicy;
+use App\Ai\Safety\InputValidator;
 use App\Enums\MessageRole;
-use App\Http\Requests\SendMessageRequest;
 use App\Jobs\ExtractConversationMemories;
 use App\Jobs\RefreshConversationSummary;
 use App\Jobs\UpdateRelationshipState;
@@ -13,13 +14,17 @@ use App\Models\Message;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use LogicException;
 use Throwable;
 
 class StreamMessageAction
 {
+    public function __construct(
+        private readonly InputValidator $inputValidator,
+        private readonly ChatSafetyPolicy $chatSafetyPolicy,
+    ) {}
+
     /**
      * @return array{
      *     conversation: Conversation,
@@ -37,13 +42,20 @@ class StreamMessageAction
             $conversation
         );
 
-        $validated = Validator::make(
-            [
-                'message' => trim($content),
-            ],
-            SendMessageRequest::messageRules(),
-            SendMessageRequest::messageValidationMessages()
-        )->validate();
+        $validated = [
+            'message' =>
+                $this
+                    ->inputValidator
+                    ->validateMessage(
+                        $content
+                    ),
+        ];
+
+        $this
+            ->chatSafetyPolicy
+            ->assertGenerationAllowed(
+                $user
+            );
 
         return DB::transaction(
             function () use (
@@ -148,6 +160,12 @@ class StreamMessageAction
             'update',
             $conversation
         );
+
+        $this
+            ->chatSafetyPolicy
+            ->assertGenerationAllowed(
+                $user
+            );
 
         return DB::transaction(
             function () use (

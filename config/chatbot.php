@@ -19,6 +19,23 @@ return [
         4000
     ),
 
+    'response_max_length' => (int) env(
+        'CHAT_RESPONSE_MAX_LENGTH',
+        12000
+    ),
+
+    'rate_limits' => [
+        'generation_per_minute' => (int) env(
+            'CHAT_GENERATION_RATE_LIMIT',
+            20
+        ),
+
+        'reset_per_hour' => (int) env(
+            'CHAT_RESET_RATE_LIMIT',
+            3
+        ),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Conversation summaries

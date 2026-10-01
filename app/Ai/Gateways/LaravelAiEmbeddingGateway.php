@@ -84,8 +84,7 @@ final class LaravelAiEmbeddingGateway implements EmbeddingGateway
         } catch (Throwable $exception) {
             throw new AiProviderException(
                 'AI embedding request failed.',
-                0,
-                $exception
+                0
             );
         }
 

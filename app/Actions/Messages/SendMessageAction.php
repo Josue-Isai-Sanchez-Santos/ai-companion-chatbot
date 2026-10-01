@@ -4,8 +4,9 @@ namespace App\Actions\Messages;
 
 use App\Ai\Agents\CharacterAgent;
 use App\Ai\Exceptions\AiGatewayException;
+use App\Ai\Safety\ChatSafetyPolicy;
+use App\Ai\Safety\InputValidator;
 use App\Enums\MessageRole;
-use App\Http\Requests\SendMessageRequest;
 use App\Jobs\ExtractConversationMemories;
 use App\Jobs\RefreshConversationSummary;
 use App\Jobs\UpdateRelationshipState;
@@ -14,12 +15,13 @@ use App\Models\Message;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Validator;
 
 class SendMessageAction
 {
     public function __construct(
-        private readonly CharacterAgent $characterAgent
+        private readonly CharacterAgent $characterAgent,
+        private readonly InputValidator $inputValidator,
+        private readonly ChatSafetyPolicy $chatSafetyPolicy,
     ) {}
 
     /**
@@ -39,13 +41,20 @@ class SendMessageAction
             $conversation
         );
 
-        $validated = Validator::make(
-            [
-                'message' => trim($content),
-            ],
-            SendMessageRequest::messageRules(),
-            SendMessageRequest::messageValidationMessages()
-        )->validate();
+        $validated = [
+            'message' =>
+                $this
+                    ->inputValidator
+                    ->validateMessage(
+                        $content
+                    ),
+        ];
+
+        $this
+            ->chatSafetyPolicy
+            ->assertGenerationAllowed(
+                $user
+            );
 
         /*
          * The user message is committed BEFORE

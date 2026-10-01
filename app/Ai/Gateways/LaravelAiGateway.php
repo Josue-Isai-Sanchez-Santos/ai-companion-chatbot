@@ -36,8 +36,7 @@ final class LaravelAiGateway implements ChatGateway
         } catch (Throwable $exception) {
             throw new AiProviderException(
                 'AI provider request failed.',
-                0,
-                $exception
+                0
             );
         }
 
@@ -103,8 +102,7 @@ final class LaravelAiGateway implements ChatGateway
         } catch (Throwable $exception) {
             throw new AiProviderException(
                 'AI provider streaming request failed.',
-                0,
-                $exception
+                0
             );
         }
 

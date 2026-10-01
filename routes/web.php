@@ -24,7 +24,13 @@ Route::middleware('auth')
         Route::post(
             '/character/reset',
             ResetCharacterController::class
-        )->name('character.reset');
+        )
+            ->middleware(
+                'throttle:character-reset'
+            )
+            ->name(
+                'character.reset'
+            );
 
         Route::post(
             '/chat/stream',
