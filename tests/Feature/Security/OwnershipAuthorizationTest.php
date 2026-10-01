@@ -21,6 +21,7 @@ use App\Models\UserCharacterProfile;
 use Database\Seeders\CharacterSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
@@ -432,6 +433,14 @@ class OwnershipAuthorizationTest extends TestCase
 
         $policy = app(
             ChatSafetyPolicy::class
+        );
+
+        $rateLimitKey =
+            'chat-generation:user:'
+            .$user->id;
+
+        RateLimiter::clear(
+            $rateLimitKey
         );
 
         $policy->assertGenerationAllowed(

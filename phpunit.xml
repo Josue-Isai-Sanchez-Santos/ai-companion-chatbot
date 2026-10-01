@@ -31,6 +31,15 @@
         <env name="RELATIONSHIP_ANALYSIS_ENABLED" value="false"/>
         <env name="CHAT_GENERATION_RATE_LIMIT" value="1000"/>
         <env name="CHAT_RESET_RATE_LIMIT" value="1000"/>
+
+        <!--
+            Automated tests must never depend on
+            real external AI providers or secrets.
+        -->
+        <env name="AI_CHAT_DRIVER" value="simulated" force="true"/>
+        <env name="AI_EMBEDDING_DRIVER" value="simulated" force="true"/>
+        <env name="OPENAI_API_KEY" value="" force="true"/>
+        <env name="OLLAMA_API_KEY" value="" force="true"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
