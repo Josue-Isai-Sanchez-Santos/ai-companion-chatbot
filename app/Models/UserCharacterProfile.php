@@ -77,4 +77,11 @@ class UserCharacterProfile extends Model
             RelationshipEvent::class
         );
     }
+
+    public function generatedAssets(): HasMany
+    {
+        return $this->hasMany(
+            GeneratedAsset::class
+        );
+    }
 }

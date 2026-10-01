@@ -80,11 +80,13 @@ Si cualquiera de esas operaciones falla antes del commit, toda la operación de 
 
 ## Archivos generados
 
-Los assets específicos de un perfil deben almacenarse en el disco `public` bajo:
+Los assets específicos de un perfil deben almacenarse en el disco privado `local` bajo:
 
 `character-assets/profiles/{profile_id}/`
 
-Después de que la transacción haya hecho commit se elimina únicamente el directorio del perfil anterior.
+La ruta física correspondiente permanece fuera del directorio público de la aplicación.
+
+Los registros de `generated_assets` se eliminan mediante la cascada del perfil. Después de que la transacción haya hecho commit se elimina únicamente el directorio físico del perfil anterior.
 
 Los archivos base del personaje no pertenecen a ese directorio y nunca deben eliminarse durante un reset.
 

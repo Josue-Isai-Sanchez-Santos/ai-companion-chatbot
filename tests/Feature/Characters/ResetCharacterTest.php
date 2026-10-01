@@ -43,6 +43,10 @@ class ResetCharacterTest extends TestCase
             'public'
         );
 
+        Storage::fake(
+            'local'
+        );
+
         $this->seed(
             CharacterSeeder::class
         );
@@ -287,7 +291,7 @@ class ResetCharacterTest extends TestCase
             $oldProfileId
         );
 
-        Storage::disk('public')
+        Storage::disk('local')
             ->put(
                 $assetDirectory
                     .'/generated-image.png',
@@ -492,7 +496,7 @@ class ResetCharacterTest extends TestCase
             ]
         );
 
-        Storage::disk('public')
+        Storage::disk('local')
             ->assertMissing(
                 $assetDirectory
                     .'/generated-image.png'
@@ -683,7 +687,7 @@ class ResetCharacterTest extends TestCase
             $oldProfileId
         );
 
-        Storage::disk('public')
+        Storage::disk('local')
             ->put(
                 $assetDirectory
                     .'/keep-me.txt',
@@ -755,7 +759,7 @@ class ResetCharacterTest extends TestCase
             0
         );
 
-        Storage::disk('public')
+        Storage::disk('local')
             ->assertExists(
                 $assetDirectory
                     .'/keep-me.txt'
