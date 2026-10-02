@@ -1,29 +1,23 @@
 # Sistema de memoria
 
-## Propósito
-
-Este documento describirá cómo el chatbot almacena, selecciona, recupera, actualiza y elimina información relevante de las conversaciones.
-
 ## Estado
 
-**Borrador.**
+**Implementado para la versión 1.0.**
 
-Los criterios exactos de similitud, importancia y confianza se ajustarán mediante pruebas.
+El sistema utiliza memoria explícita, embeddings y recuperación semántica para proporcionar continuidad sin enviar indiscriminadamente todo el historial al modelo.
 
-## Alcance de la versión 1.0
+## Objetivos
 
-La versión 1.0 contemplará:
+La memoria debe:
 
-- Contexto inmediato basado en mensajes recientes.
-- Resúmenes de conversaciones largas.
-- Memorias persistentes.
-- Embeddings almacenados con pgvector.
-- Recuperación semántica de recuerdos relevantes.
-- Clasificación por tipo, importancia y confianza.
-- Detección y reducción de memorias duplicadas.
-- Memorias temporales con posible fecha de expiración.
-- Interfaz para que el usuario consulte, modifique y elimine recuerdos.
+- permanecer aislada por usuario y personaje;
+- almacenar únicamente información suficientemente estable;
+- recuperar solo información relevante;
+- permitir edición y eliminación manual;
+- evitar duplicados semánticos;
+- excluir información expirada;
+- desaparecer durante un reset completo.
 
-El sistema no guardará automáticamente cada mensaje como una memoria permanente.
+## Tipos de memoria
 
-La memoria será independiente del entrenamiento del modelo y se eliminará durante el restablecimiento completo del personaje.
+La aplicación contempla tipos como:
