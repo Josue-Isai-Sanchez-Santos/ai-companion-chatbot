@@ -548,6 +548,6 @@ Consultar [`docs/threat-model.md`](docs/threat-model.md).
 
 ## Licencia
 
-El repositorio no incluye actualmente un archivo `LICENSE`.
+Este proyecto se distribuye bajo la licencia MIT.
 
-Antes de distribuir el proyecto bajo una licencia concreta debe añadirse explícitamente el archivo correspondiente.
+Consulta [`LICENSE`](LICENSE) para conocer sus términos.
