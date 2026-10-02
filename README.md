@@ -8,36 +8,26 @@ Aplicación web construida con Laravel para conversar con un personaje ficticio 
 
 **Versión 1.0 funcional.**
 
-La versión 1.0 incluye autenticación, conversaciones persistentes, streaming, memoria semántica, resúmenes, progreso de relación, expresiones, regeneración de respuestas, restablecimiento completo, autorización por usuario, almacenamiento privado de assets, pruebas automatizadas e integración continua.
+La versión 1.0 incluye autenticación, personaje base, perfil independiente por usuario, conversaciones persistentes, streaming, regeneración con ramas, memoria semántica con pgvector, extracción automática de memorias, resúmenes, progreso de relación, estado emocional, restablecimiento completo, almacenamiento privado para assets, autorización, seguridad, pruebas automatizadas e integración continua.
 
-La generación real de imágenes, audio y video permanece fuera del alcance de esta versión.
+La generación real de imágenes, audio y video permanece fuera del alcance de la versión 1.0.
 
-## Funciones principales
+## Objetivo del proyecto
 
-- Registro e inicio de sesión.
-- Personaje base compartido e inmutable desde la experiencia normal del usuario.
-- Perfil independiente del personaje para cada usuario.
-- Personalidad, forma de hablar y escenario personalizados.
-- Conversaciones persistentes.
-- Mensajes con historial y ramas.
-- Respuestas normales y por streaming.
-- Regeneración de respuestas sin destruir la alternativa anterior.
-- Memorias persistentes.
-- Embeddings almacenados mediante pgvector.
-- Recuperación semántica de memorias.
-- Resúmenes automáticos de conversaciones largas.
-- Estado de relación con métricas de confianza, afecto, familiaridad y tensión.
-- Estado emocional y selección de expresión.
-- Administrador de memorias.
-- Restablecimiento completo del personaje.
-- Auditoría mínima de restablecimientos.
-- Registro seguro de assets generados.
-- Aislamiento y autorización por usuario.
-- Rate limiting.
-- Validación de entrada y salida.
-- Soporte para proveedor externo o modelo local.
-- Suite automatizada de pruebas.
-- GitHub Actions.
+El proyecto demuestra cómo construir un chatbot persistente sin delegar toda la lógica de la aplicación al modelo de inteligencia artificial.
+
+El sistema separa:
+
+- identidad base del personaje;
+- personalización específica del usuario;
+- historial conversacional;
+- resúmenes;
+- memoria semántica;
+- estado de relación;
+- estado emocional;
+- acceso al proveedor de IA.
+
+El proveedor de IA no consulta directamente la base de datos. Laravel selecciona, autoriza y prepara el contexto antes de realizar cada solicitud.
 
 ## Tecnologías
 
@@ -54,6 +44,7 @@ La generación real de imágenes, audio y video permanece fuera del alcance de e
 - Laravel Queue
 - Vite 8
 - Node.js 24
+- npm
 - PHPUnit 12
 - Laravel Pint
 
@@ -66,221 +57,316 @@ flowchart LR
     APP[Laravel]
     DB[(PostgreSQL + pgvector)]
     QUEUE[Laravel Queue]
-    AI[ChatGateway]
+    CHAT[ChatGateway]
+    EMB[EmbeddingGateway]
     PROVIDER[Ollama / proveedor externo]
     STORAGE[Storage privado]
 
     U --> UI
     UI --> APP
     APP --> DB
-    APP --> AI
-    AI --> PROVIDER
+    APP --> CHAT
+    APP --> EMB
+    CHAT --> PROVIDER
+    EMB --> PROVIDER
     APP --> QUEUE
     QUEUE --> DB
     QUEUE --> PROVIDER
     APP --> STORAGE
 ```
 
-La aplicación es un monolito modular. El proveedor de inteligencia artificial no consulta directamente la base de datos. Laravel prepara el contexto, aplica autorización, recupera memorias y construye los prompts antes de llamar al proveedor.
+La arquitectura completa se describe en [`docs/architecture.md`](docs/architecture.md).
 
-La arquitectura completa está documentada en [`docs/architecture.md`](docs/architecture.md).
+## Funciones principales
+
+### Autenticación
+
+La aplicación permite registro, inicio de sesión y cierre de sesión. Las rutas de chat, memoria y reset están protegidas mediante autenticación.
+
+### Personaje base
+
+La definición base incluye:
+
+- nombre;
+- descripción;
+- personalidad;
+- historia;
+- forma de hablar;
+- escenario;
+- reglas internas;
+- mensaje inicial;
+- expresiones.
+
+El personaje base no se modifica como consecuencia de las conversaciones.
+
+### Perfil por usuario
+
+Cada combinación usuario-personaje tiene un `UserCharacterProfile` con:
+
+- personalidad personalizada;
+- forma de hablar personalizada;
+- escenario personalizado;
+- apodos;
+- mood actual;
+- expresión actual;
+- etapa de relación;
+- confianza;
+- afecto;
+- familiaridad;
+- tensión;
+- última interacción.
+
+### Conversaciones y mensajes
+
+Cada perfil puede tener múltiples conversaciones. Los mensajes conservan historial, cadena padre-hijo, estado y selección de rama activa.
+
+Estados de mensaje:
+
+- `streaming`;
+- `completed`;
+- `failed`;
+- `interrupted`.
+
+### Streaming
+
+La generación por streaming utiliza un mensaje de asistente temporal con estado `streaming`. Cuando la generación finaliza correctamente pasa a `completed`. Los reintentos reutilizan el mensaje correspondiente cuando procede.
+
+### Regeneración
+
+La última respuesta activa del asistente puede regenerarse. La respuesta anterior no se sobrescribe: se conserva como rama inactiva y la nueva respuesta pasa a ser la rama activa.
+
+### Memoria semántica
+
+Las memorias se almacenan en PostgreSQL y pueden incluir embeddings de 1536 dimensiones. La recuperación considera similitud, importancia, confianza, disponibilidad, deduplicación y límite de resultados.
+
+### Resúmenes
+
+Las conversaciones largas pueden generar un resumen persistente. Cuando existe un resumen se incluye en el prompt y se reduce el número de mensajes recientes necesarios.
+
+### Relación
+
+El sistema mantiene:
+
+- confianza;
+- afecto;
+- familiaridad;
+- tensión.
+
+Etapas:
+
+1. `strangers`
+2. `acquaintances`
+3. `friends`
+4. `close_friends`
+5. `romantic_interest`
+6. `partners`
+
+La IA propone cambios, pero el backend limita y aplica los valores.
+
+### Estado emocional
+
+Moods definidos:
+
+- `neutral`
+- `happy`
+- `sad`
+- `angry`
+- `embarrassed`
+- `surprised`
+- `curious`
+
+### Restablecimiento completo
+
+El reset elimina el estado específico del perfil y crea una relación nueva sin eliminar la cuenta ni modificar el personaje base.
 
 ## Requisitos
 
-Para desarrollo local se recomienda disponer de:
+Para desarrollo local se recomienda:
 
-- Git.
-- PHP 8.3 o superior.
-- Composer 2.
-- Node.js 24.
-- npm.
-- Docker.
+- Git;
+- PHP 8.3 o superior;
+- Composer 2;
+- Node.js 24;
+- npm;
+- Docker;
 - Docker Compose.
 
-PHP debe disponer, entre otras, de las extensiones utilizadas por Laravel y PostgreSQL:
+PHP debe disponer, entre otras, de estas extensiones:
 
 - `mbstring`
 - `intl`
 - `pdo_pgsql`
 - `pgsql`
 
-Ollama solo es necesario cuando se utilice el proveedor local.
+Ollama es opcional y solo es necesario para utilizar modelos locales.
 
-## Instalación
+## Instalación desde cero
 
 Clonar el repositorio:
 
-```
+```bash
 git clone https://github.com/Josue-Isai-Sanchez-Santos/ai-companion-chatbot.git
 cd ai-companion-chatbot
 ```
 
-Crear el archivo de entorno:
+Crear el archivo local de entorno:
 
-```
+```bash
 cp .env.example .env
 ```
 
 Instalar dependencias PHP:
 
-```
+```bash
 composer install
 ```
 
 Instalar dependencias frontend:
 
-```
+```bash
 npm ci
 ```
 
 Generar la clave de Laravel:
 
-```
+```bash
 php artisan key:generate
 ```
 
-## Levantar PostgreSQL y pgvector
+## PostgreSQL y pgvector
 
-El repositorio incluye `compose.yaml` con PostgreSQL 18 y pgvector.
+El repositorio incluye `compose.yaml`.
 
-```
+Levantar la base:
+
+```bash
 docker compose up -d db
 ```
 
-Verificar el contenedor:
+Verificar:
 
-```
+```bash
 docker compose ps
 ```
 
-Por defecto PostgreSQL queda disponible en:
+La configuración de ejemplo utiliza:
 
-```
+```text
 Host:     127.0.0.1
 Puerto:   5433
 Base:     ai_companion
 Usuario:  ai_companion
 ```
 
-Los valores utilizados por Laravel y Docker deben mantenerse consistentes en `.env`.
-
 ## Migraciones y datos iniciales
 
-Ejecutar:
-
-```
+```bash
 php artisan migrate --seed
 ```
 
-Las migraciones:
+Las migraciones crean las tablas, habilitan pgvector y preparan las restricciones e índices. El seeder crea el personaje `default-companion` y sus expresiones base.
 
-- crean las tablas de la aplicación;
-- habilitan pgvector;
-- crean la columna vectorial de memorias;
-- configuran restricciones e índices;
-- preparan tablas de colas y caché.
+## Frontend
 
-El seeder crea el personaje base `default-companion` y sus expresiones iniciales.
+Compilar para producción:
 
-## Compilar frontend
-
-Para una compilación de producción:
-
-```
+```bash
 npm run build
 ```
 
-Durante desarrollo:
+Modo desarrollo:
 
-```
+```bash
 npm run dev
 ```
 
 ## Ejecutar la aplicación
 
-Servidor Laravel:
-
-```
+```bash
 php artisan serve
 ```
 
-La dirección predeterminada será:
+Dirección predeterminada:
 
-```
+```text
 http://127.0.0.1:8000
 ```
 
-En otra terminal puede ejecutarse el worker:
+Si el puerto está ocupado:
 
+```bash
+php artisan serve --host=127.0.0.1 --port=8001
 ```
+
+## Ejecutar el worker
+
+Las funciones secundarias de memoria, resumen y relación utilizan Laravel Queue.
+
+```bash
 php artisan queue:work \
-    --queue=relationship,summary,memory,default \
+    --queue=memory,summary,relationship,default \
     --tries=3 \
     --timeout=240
 ```
 
-El worker procesa tareas secundarias como:
-
-- extracción de memorias;
-- actualización de resúmenes;
-- análisis de relación.
-
-## Crear una cuenta y probar el chat
+## Crear usuario y probar el chat
 
 Abrir:
 
-```
+```text
 http://127.0.0.1:8000/register
 ```
 
-Después de registrarse, Laravel redirige al chat.
+Después acceder a:
 
-Rutas principales:
-
-```
+```text
 /chat
+```
+
+Gestor de memorias:
+
+```text
 /memories
 ```
 
-La primera visita crea automáticamente el perfil correspondiente al personaje activo.
-
 ## Modo simulado
 
-Para probar persistencia e interfaz sin utilizar ningún modelo real:
+Permite probar la aplicación sin utilizar un proveedor real:
 
-```
+```env
 AI_CHAT_DRIVER=simulated
 AI_EMBEDDING_DRIVER=simulated
-
 MEMORY_EXTRACTION_ENABLED=false
 CONVERSATION_SUMMARY_ENABLED=false
 RELATIONSHIP_ANALYSIS_ENABLED=false
 ```
 
-Este modo es utilizado por la suite automatizada.
+Este modo se usa también en pruebas automatizadas.
 
 ## Uso con Ollama
 
-La configuración predeterminada de `.env.example` utiliza Ollama.
+La configuración de ejemplo utiliza Ollama.
 
-Modelos utilizados durante el desarrollo de v1.0:
+Modelos usados durante el desarrollo:
 
-```
+```bash
 ollama pull qwen3:4b-instruct
 ollama pull qwen3-embedding:4b
 ```
 
-Configuración:
+Variables principales:
 
-```
+```env
 AI_CHAT_DRIVER=laravel
 AI_CHAT_PROVIDER=ollama
 AI_CHAT_MODEL=qwen3:4b-instruct
+AI_CHAT_TIMEOUT=120
 
 AI_EMBEDDING_DRIVER=laravel
 AI_EMBEDDING_PROVIDER=ollama
 AI_EMBEDDING_MODEL=qwen3-embedding:4b
 AI_EMBEDDING_DIMENSIONS=1536
+AI_EMBEDDING_TIMEOUT=120
 
 OLLAMA_API_KEY=
 OLLAMA_URL=http://127.0.0.1:11434
@@ -295,13 +381,11 @@ RELATIONSHIP_ANALYSIS_PROVIDER=ollama
 RELATIONSHIP_ANALYSIS_MODEL=qwen3:4b-instruct
 ```
 
-## Uso con OpenAI
+## Uso con proveedor externo
 
-El sistema también puede utilizar un proveedor externo mediante Laravel AI.
+Ejemplo con OpenAI:
 
-Ejemplo:
-
-```
+```env
 AI_CHAT_DRIVER=laravel
 AI_CHAT_PROVIDER=openai
 AI_CHAT_MODEL=<chat-model>
@@ -325,105 +409,112 @@ RELATIONSHIP_ANALYSIS_PROVIDER=openai
 RELATIONSHIP_ANALYSIS_MODEL=<chat-model>
 ```
 
-La clave real debe existir únicamente en `.env`.
+La clave real debe existir únicamente en `.env` y nunca debe almacenarse en Git.
 
-Nunca debe añadirse a Git.
+## Variables de entorno principales
 
-## Variables principales
+### Base de datos
+
+| Variable | Función |
+| --- | --- |
+| `DB_CONNECTION` | Driver de Laravel |
+| `DB_HOST` | Host PostgreSQL |
+| `DB_PORT` | Puerto visto por Laravel |
+| `DB_DATABASE` | Base principal |
+| `DB_USERNAME` | Usuario |
+| `DB_PASSWORD` | Contraseña |
+| `POSTGRES_DB` | Base creada por Docker |
+| `POSTGRES_USER` | Usuario creado por Docker |
+| `POSTGRES_PASSWORD` | Contraseña del contenedor |
+| `POSTGRES_PORT` | Puerto publicado en el host |
 
 ### Chat
 
-| Variable                     | Propósito                                |
-| ---------------------------- | ---------------------------------------- |
-| `CHAT_RECENT_MESSAGE_LIMIT`  | Mensajes recientes incluidos en contexto |
-| `CHAT_MESSAGE_MAX_LENGTH`    | Longitud máxima de entrada               |
-| `CHAT_RESPONSE_MAX_LENGTH`   | Longitud máxima de respuesta             |
-| `CHAT_GENERATION_RATE_LIMIT` | Límite de generaciones por minuto        |
-| `CHAT_RESET_RATE_LIMIT`      | Límite de resets por hora                |
-| `CHAT_RESET_CONFIRMATION`    | Palabra necesaria para confirmar reset   |
-| `CHAT_STREAMING`             | Habilita streaming                       |
+| Variable | Función |
+| --- | --- |
+| `CHAT_RECENT_MESSAGE_LIMIT` | Mensajes recientes sin resumen |
+| `CHAT_MESSAGE_MAX_LENGTH` | Longitud máxima de entrada |
+| `CHAT_RESPONSE_MAX_LENGTH` | Longitud máxima de salida |
+| `CHAT_GENERATION_RATE_LIMIT` | Generaciones por usuario/minuto |
+| `CHAT_RESET_RATE_LIMIT` | Resets por usuario/hora |
+| `CHAT_RESET_CONFIRMATION` | Confirmación textual |
+| `CHAT_STREAMING` | Habilita streaming |
 
 ### Memoria
 
-| Variable                    | Propósito                       |
-| --------------------------- | ------------------------------- |
-| `MEMORY_ENABLED`            | Habilita recuperación semántica |
-| `MEMORY_RETRIEVAL_LIMIT`    | Máximo de memorias recuperadas  |
-| `MEMORY_MINIMUM_SIMILARITY` | Similitud mínima                |
-| `MEMORY_MINIMUM_IMPORTANCE` | Importancia mínima              |
-| `MEMORY_EXTRACTION_ENABLED` | Habilita extracción automática  |
-| `MEMORY_EXTRACTION_QUEUE`   | Cola de extracción              |
+| Variable | Función |
+| --- | --- |
+| `MEMORY_ENABLED` | Habilita recuperación semántica |
+| `MEMORY_RETRIEVAL_LIMIT` | Máximo de memorias recuperadas |
+| `MEMORY_MINIMUM_SIMILARITY` | Similitud mínima |
+| `MEMORY_MINIMUM_IMPORTANCE` | Importancia mínima |
+| `MEMORY_EXTRACTION_ENABLED` | Habilita extracción automática |
+| `MEMORY_EXTRACTION_QUEUE` | Cola |
+| `MEMORY_EXTRACTION_MESSAGE_LIMIT` | Mensajes considerados |
+| `MEMORY_EXTRACTION_MAX_MEMORIES` | Máximo de candidatos por job |
+| `MEMORY_EXTRACTION_MINIMUM_IMPORTANCE` | Importancia mínima |
+| `MEMORY_EXTRACTION_MINIMUM_CONFIDENCE` | Confianza mínima |
+| `MEMORY_EXTRACTION_DUPLICATE_SIMILARITY` | Umbral de duplicado |
 
-### Inteligencia artificial
+### IA
 
-| Variable                  | Propósito                       |
-| ------------------------- | ------------------------------- |
-| `AI_CHAT_DRIVER`          | Implementación de `ChatGateway` |
-| `AI_CHAT_PROVIDER`        | Proveedor de conversación       |
-| `AI_CHAT_MODEL`           | Modelo de conversación          |
-| `AI_EMBEDDING_DRIVER`     | Implementación de embeddings    |
-| `AI_EMBEDDING_PROVIDER`   | Proveedor de embeddings         |
-| `AI_EMBEDDING_MODEL`      | Modelo de embeddings            |
-| `AI_EMBEDDING_DIMENSIONS` | Dimensiones del vector          |
+| Variable | Función |
+| --- | --- |
+| `AI_CHAT_DRIVER` | Gateway de conversación |
+| `AI_CHAT_PROVIDER` | Proveedor |
+| `AI_CHAT_MODEL` | Modelo |
+| `AI_CHAT_TIMEOUT` | Timeout |
+| `AI_EMBEDDING_DRIVER` | Gateway de embeddings |
+| `AI_EMBEDDING_PROVIDER` | Proveedor de embeddings |
+| `AI_EMBEDDING_MODEL` | Modelo de embeddings |
+| `AI_EMBEDDING_DIMENSIONS` | Dimensiones |
+| `AI_EMBEDDING_TIMEOUT` | Timeout |
 
 ## Pruebas
 
-Ejecutar:
+Preparar una base de pruebas según `.env.testing.example` y ejecutar:
 
-```
+```bash
 php artisan test
 ```
 
-La suite cubre, entre otros:
+La suite cubre contratos de proveedores, autenticación, conversaciones, mensajes, streaming, memoria, recuperación semántica, resúmenes, relación, expresiones, regeneración, ramas, reset, assets, autorización, seguridad, cascadas y flujo crítico de v1.0.
 
-- autenticación;
-- perfiles;
-- conversaciones;
-- mensajes;
-- streaming;
-- proveedor falso;
-- memoria;
-- recuperación semántica;
-- resúmenes;
-- relación;
-- expresiones;
-- regeneración;
-- reset;
-- autorización;
-- assets;
-- cascadas de base de datos.
-
-Las pruebas utilizan drivers simulados y no requieren claves reales.
+Las pruebas utilizan drivers simulados y no requieren API keys reales.
 
 ## Integración continua
 
-GitHub Actions ejecuta automáticamente:
+El workflow `.github/workflows/ci.yml` se ejecuta en `push` y `pull_request` hacia `main`.
 
-```
-Composer validation
-Composer install
-npm ci
-Pint para PHP modificado
-npm run build
-migrate:fresh
-php artisan test
-```
+Comprueba:
 
-La base utilizada por CI es PostgreSQL con pgvector.
+1. checkout;
+2. PHP;
+3. Node.js;
+4. `composer validate --strict`;
+5. `composer install`;
+6. `npm ci`;
+7. entorno de pruebas y `APP_KEY`;
+8. Pint para PHP modificado;
+9. `npm run build`;
+10. migraciones;
+11. `php artisan test`.
+
+GitHub Actions utiliza PostgreSQL con pgvector y drivers simulados de IA.
 
 ## Capturas de pantalla
 
 ### Chat
 
-
+![Pantalla principal del chat](docs/screenshots/chat.png)
 
 ### Gestor de memorias
 
-
+![Gestor de memorias](docs/screenshots/memories.png)
 
 ### Restablecimiento completo
 
-
+![Restablecimiento completo del personaje](docs/screenshots/reset-modal.png)
 
 ## Documentación técnica
 
@@ -437,37 +528,26 @@ La base utilizada por CI es PostgreSQL con pgvector.
 
 ## Limitaciones conocidas
 
-La versión 1.0 tiene deliberadamente varias limitaciones:
-
-- La interfaz trabaja con un único personaje activo.
+- La interfaz de v1.0 trabaja con un personaje activo.
 - El personaje incluido por defecto es un personaje de desarrollo.
-- No existe generación de imágenes, audio o video.
-- `generated_assets` prepara el registro y almacenamiento seguro, pero no implementa generación multimedia.
-- No existe todavía un endpoint público para servir assets privados.
-- El sistema de embeddings utiliza actualmente vectores de 1536 dimensiones.
-- Las funciones de memoria, resumen y relación requieren un worker cuando utilizan colas.
-- La resistencia a prompt injection es defensa en profundidad y no una garantía absoluta.
-- Un fallo del filesystem posterior al commit de un reset no puede revertir la transacción ya confirmada.
-- El consumo, disponibilidad y coste de proveedores externos dependen del proveedor utilizado.
+- No existe generación real de imágenes, audio o video.
+- `generated_assets` prepara persistencia y seguridad para multimedia futura.
+- No existe un endpoint público de descarga de assets privados.
+- Los embeddings tienen actualmente 1536 dimensiones.
+- Memoria, resumen y relación dependen del worker cuando sus funciones asíncronas están activas.
+- La calidad de memoria, resumen y análisis de relación depende del modelo configurado.
+- La resistencia frente a prompt injection es defensa en profundidad, no una garantía absoluta.
+- Un error del filesystem después de confirmar un reset no puede revertir la transacción PostgreSQL ya confirmada.
+- El coste y disponibilidad de un proveedor externo dependen del proveedor utilizado.
 
 ## Seguridad
 
-El proyecto implementa:
+Entre las medidas implementadas se encuentran autenticación, Policies, aislamiento por propietario, CSRF, validación de entrada y salida, rate limiting, control de mass assignment, almacenamiento privado, rutas generadas internamente, variables de entorno, transacciones, restricciones de base de datos y pruebas de autorización.
 
-- autenticación;
-- policies de autorización;
-- aislamiento por usuario;
-- CSRF;
-- validación de entradas;
-- validación de salidas;
-- rate limiting;
-- almacenamiento privado de assets;
-- rutas generadas internamente;
-- protección de secretos mediante variables de entorno;
-- cascadas y transacciones para eliminación de datos.
-
-Consultar [`docs/threat-model.md`](docs/threat-model.md) para detalles y riesgos residuales.
+Consultar [`docs/threat-model.md`](docs/threat-model.md).
 
 ## Licencia
 
-Este proyecto se distribuye bajo licencia MIT.
+El repositorio no incluye actualmente un archivo `LICENSE`.
+
+Antes de distribuir el proyecto bajo una licencia concreta debe añadirse explícitamente el archivo correspondiente.
