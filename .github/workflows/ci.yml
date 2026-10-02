@@ -108,7 +108,12 @@ jobs:
       - name: Prepare testing environment
         run: |
           cp .env.testing.example .env.testing
-          php artisan key:generate --env=testing
+          php artisan key:generate --env=testing --force
+
+          if ! grep -qE '^APP_KEY=base64:[A-Za-z0-9+/=]+$' .env.testing; then
+            echo "APP_KEY was not generated in .env.testing."
+            exit 1
+          fi
 
       - name: Check changed PHP style
         shell: bash
