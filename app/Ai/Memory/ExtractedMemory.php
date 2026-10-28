@@ -40,8 +40,7 @@ final readonly class ExtractedMemory
         return array_map(
             static fn (
                 MemoryType $type
-            ): string =>
-                $type->value,
+            ): string => $type->value,
 
             self::allowedTypes()
         );
@@ -150,8 +149,7 @@ final readonly class ExtractedMemory
             content: $content,
             importance: $importance,
             confidence: $confidence,
-            sourceMessageId:
-                $sourceMessageId,
+            sourceMessageId: $sourceMessageId,
         );
     }
 }

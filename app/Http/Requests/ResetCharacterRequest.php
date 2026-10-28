@@ -45,17 +45,13 @@ final class ResetCharacterRequest extends FormRequest
             );
 
         return [
-            'profile_id.required' =>
-                'No se indicó el perfil a restablecer.',
+            'profile_id.required' => 'No se indicó el perfil a restablecer.',
 
-            'profile_id.exists' =>
-                'El perfil seleccionado ya no existe.',
+            'profile_id.exists' => 'El perfil seleccionado ya no existe.',
 
-            'confirmation.required' =>
-                "Escribe {$confirmation} para confirmar.",
+            'confirmation.required' => "Escribe {$confirmation} para confirmar.",
 
-            'confirmation.in' =>
-                "Debes escribir exactamente {$confirmation}.",
+            'confirmation.in' => "Debes escribir exactamente {$confirmation}.",
         ];
     }
 }

@@ -139,20 +139,15 @@ class SemanticMemoryRetrievalTest extends TestCase
             $user,
             $profile,
             [
-                'type' =>
-                    MemoryType::UserFact,
+                'type' => MemoryType::UserFact,
 
-                'content' =>
-                    $content,
+                'content' => $content,
 
-                'importance' =>
-                    $importance,
+                'importance' => $importance,
 
-                'confidence' =>
-                    $confidence,
+                'confidence' => $confidence,
 
-                'embedding' =>
-                    $embedding,
+                'embedding' => $embedding,
             ]
         );
     }
@@ -322,8 +317,7 @@ class SemanticMemoryRetrievalTest extends TestCase
 
         $this->assertFalse(
             $results->contains(
-                fn (Memory $memory): bool =>
-                    $memory->id
+                fn (Memory $memory): bool => $memory->id
                     === $foreignMemory->id
             )
         );
@@ -359,20 +353,16 @@ class SemanticMemoryRetrievalTest extends TestCase
         $expired = $profile
             ->memories()
             ->create([
-                'type' =>
-                    MemoryType::UserFact,
+                'type' => MemoryType::UserFact,
 
-                'content' =>
-                    'Memoria expirada.',
+                'content' => 'Memoria expirada.',
 
                 'importance' => 0.9,
                 'confidence' => 1.0,
 
-                'embedding' =>
-                    $this->axis(0),
+                'embedding' => $this->axis(0),
 
-                'expires_at' =>
-                    now()->subMinute(),
+                'expires_at' => now()->subMinute(),
             ]);
 
         $results = app(
@@ -578,8 +568,7 @@ class SemanticMemoryRetrievalTest extends TestCase
 
         $this->assertFalse(
             $results->contains(
-                fn (Memory $memory): bool =>
-                    $memory->id
+                fn (Memory $memory): bool => $memory->id
                     === $third->id
             )
         );
@@ -671,8 +660,7 @@ class SemanticMemoryRetrievalTest extends TestCase
         $conversation = $profile
             ->conversations()
             ->create([
-                'title' =>
-                    'Prueba memoria semántica',
+                'title' => 'Prueba memoria semántica',
             ]);
 
         $this->fakeEmbedding(

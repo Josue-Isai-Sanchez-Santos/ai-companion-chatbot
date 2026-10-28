@@ -9,9 +9,7 @@ use App\Enums\MessageRole;
 use App\Enums\RelationshipStage;
 use App\Models\Character;
 use App\Models\GeneratedAsset;
-use App\Models\Memory;
 use App\Models\Message;
-use App\Models\RelationshipEvent;
 use App\Models\User;
 use App\Models\UserCharacterProfile;
 use Database\Seeders\CharacterSeeder;
@@ -67,97 +65,73 @@ final class DatabaseCascadeTest extends TestCase
             $profile
                 ->conversations()
                 ->create([
-                    'title' =>
-                        'Cascade test',
+                    'title' => 'Cascade test',
 
-                    'summary' =>
-                        'Summary to delete',
+                    'summary' => 'Summary to delete',
 
-                    'summary_updated_at' =>
-                        now(),
+                    'summary_updated_at' => now(),
                 ]);
 
         $userMessage =
             $conversation
                 ->messages()
                 ->create([
-                    'role' =>
-                        MessageRole::User,
+                    'role' => MessageRole::User,
 
-                    'content' =>
-                        'Cascade user message',
+                    'content' => 'Cascade user message',
 
-                    'status' =>
-                        Message::STATUS_COMPLETED,
+                    'status' => Message::STATUS_COMPLETED,
 
-                    'is_active_branch' =>
-                        true,
+                    'is_active_branch' => true,
                 ]);
 
         $assistantMessage =
             $conversation
                 ->messages()
                 ->create([
-                    'parent_message_id' =>
-                        $userMessage->id,
+                    'parent_message_id' => $userMessage->id,
 
-                    'role' =>
-                        MessageRole::Assistant,
+                    'role' => MessageRole::Assistant,
 
-                    'content' =>
-                        'Cascade assistant message',
+                    'content' => 'Cascade assistant message',
 
-                    'status' =>
-                        Message::STATUS_COMPLETED,
+                    'status' => Message::STATUS_COMPLETED,
 
-                    'is_active_branch' =>
-                        true,
+                    'is_active_branch' => true,
                 ]);
 
         $memory =
             $profile
                 ->memories()
                 ->create([
-                    'source_message_id' =>
-                        $userMessage->id,
+                    'source_message_id' => $userMessage->id,
 
-                    'type' =>
-                        MemoryType::UserFact,
+                    'type' => MemoryType::UserFact,
 
-                    'content' =>
-                        'Cascade memory',
+                    'content' => 'Cascade memory',
 
-                    'importance' =>
-                        0.8,
+                    'importance' => 0.8,
 
-                    'confidence' =>
-                        1.0,
+                    'confidence' => 1.0,
 
-                    'embedding' =>
-                        null,
+                    'embedding' => null,
                 ]);
 
         $event =
             $profile
                 ->relationshipEvents()
                 ->create([
-                    'conversation_id' =>
-                        $conversation->id,
+                    'conversation_id' => $conversation->id,
 
-                    'user_message_id' =>
-                        $userMessage->id,
+                    'user_message_id' => $userMessage->id,
 
-                    'assistant_message_id' =>
-                        $assistantMessage->id,
+                    'assistant_message_id' => $assistantMessage->id,
 
-                    'event_summary' =>
-                        'Cascade relationship event',
+                    'event_summary' => 'Cascade relationship event',
 
-                    'from_stage' =>
-                        RelationshipStage::Strangers,
+                    'from_stage' => RelationshipStage::Strangers,
 
-                    'to_stage' =>
-                        RelationshipStage::Acquaintances,
+                    'to_stage' => RelationshipStage::Acquaintances,
 
                     'requested_trust_delta' => 1,
                     'applied_trust_delta' => 1,
@@ -184,10 +158,8 @@ final class DatabaseCascadeTest extends TestCase
             GeneratedAsset::registerForProfile(
                 $profile,
                 AssetType::Other,
-                mimeType:
-                    'text/plain',
-                sizeBytes:
-                    4
+                mimeType: 'text/plain',
+                sizeBytes: 4
             );
 
         $profileId =
@@ -216,56 +188,49 @@ final class DatabaseCascadeTest extends TestCase
         $this->assertDatabaseMissing(
             'user_character_profiles',
             [
-                'id' =>
-                    $profileId,
+                'id' => $profileId,
             ]
         );
 
         $this->assertDatabaseMissing(
             'conversations',
             [
-                'id' =>
-                    $conversationId,
+                'id' => $conversationId,
             ]
         );
 
         $this->assertDatabaseMissing(
             'messages',
             [
-                'id' =>
-                    $userMessageId,
+                'id' => $userMessageId,
             ]
         );
 
         $this->assertDatabaseMissing(
             'messages',
             [
-                'id' =>
-                    $assistantMessageId,
+                'id' => $assistantMessageId,
             ]
         );
 
         $this->assertDatabaseMissing(
             'memories',
             [
-                'id' =>
-                    $memoryId,
+                'id' => $memoryId,
             ]
         );
 
         $this->assertDatabaseMissing(
             'relationship_events',
             [
-                'id' =>
-                    $eventId,
+                'id' => $eventId,
             ]
         );
 
         $this->assertDatabaseMissing(
             'generated_assets',
             [
-                'id' =>
-                    $assetId,
+                'id' => $assetId,
             ]
         );
 
@@ -276,16 +241,14 @@ final class DatabaseCascadeTest extends TestCase
         $this->assertDatabaseHas(
             'users',
             [
-                'id' =>
-                    $user->id,
+                'id' => $user->id,
             ]
         );
 
         $this->assertDatabaseHas(
             'characters',
             [
-                'id' =>
-                    $this->character->id,
+                'id' => $this->character->id,
             ]
         );
     }
@@ -305,25 +268,20 @@ final class DatabaseCascadeTest extends TestCase
             $profile
                 ->conversations()
                 ->create([
-                    'title' =>
-                        'User cascade',
+                    'title' => 'User cascade',
                 ]);
 
         $message =
             $conversation
                 ->messages()
                 ->create([
-                    'role' =>
-                        MessageRole::User,
+                    'role' => MessageRole::User,
 
-                    'content' =>
-                        'Delete with user',
+                    'content' => 'Delete with user',
 
-                    'status' =>
-                        Message::STATUS_COMPLETED,
+                    'status' => Message::STATUS_COMPLETED,
 
-                    'is_active_branch' =>
-                        true,
+                    'is_active_branch' => true,
                 ]);
 
         $profileId =
@@ -343,24 +301,21 @@ final class DatabaseCascadeTest extends TestCase
         $this->assertDatabaseMissing(
             'user_character_profiles',
             [
-                'id' =>
-                    $profileId,
+                'id' => $profileId,
             ]
         );
 
         $this->assertDatabaseMissing(
             'conversations',
             [
-                'id' =>
-                    $conversationId,
+                'id' => $conversationId,
             ]
         );
 
         $this->assertDatabaseMissing(
             'messages',
             [
-                'id' =>
-                    $messageId,
+                'id' => $messageId,
             ]
         );
 
@@ -371,8 +326,7 @@ final class DatabaseCascadeTest extends TestCase
         $this->assertDatabaseHas(
             'characters',
             [
-                'id' =>
-                    $characterId,
+                'id' => $characterId,
             ]
         );
     }

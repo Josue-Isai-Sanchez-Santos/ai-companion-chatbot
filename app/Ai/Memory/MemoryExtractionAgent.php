@@ -8,9 +8,7 @@ use Laravel\Ai\Contracts\HasStructuredOutput;
 use Laravel\Ai\Promptable;
 use Stringable;
 
-final class MemoryExtractionAgent implements
-    Agent,
-    HasStructuredOutput
+final class MemoryExtractionAgent implements Agent, HasStructuredOutput
 {
     use Promptable;
 
@@ -92,39 +90,33 @@ INSTRUCTIONS;
                 ->array()
                 ->items(
                     $schema->object([
-                        'type' =>
-                            $schema
-                                ->string()
-                                ->enum(
-                                    ExtractedMemory::
-                                        allowedTypeValues()
-                                )
-                                ->required(),
+                        'type' => $schema
+                            ->string()
+                            ->enum(
+                                ExtractedMemory::allowedTypeValues()
+                            )
+                            ->required(),
 
-                        'content' =>
-                            $schema
-                                ->string()
-                                ->required(),
+                        'content' => $schema
+                            ->string()
+                            ->required(),
 
-                        'importance' =>
-                            $schema
-                                ->number()
-                                ->min(0)
-                                ->max(1)
-                                ->required(),
+                        'importance' => $schema
+                            ->number()
+                            ->min(0)
+                            ->max(1)
+                            ->required(),
 
-                        'confidence' =>
-                            $schema
-                                ->number()
-                                ->min(0)
-                                ->max(1)
-                                ->required(),
+                        'confidence' => $schema
+                            ->number()
+                            ->min(0)
+                            ->max(1)
+                            ->required(),
 
-                        'source_message_id' =>
-                            $schema
-                                ->integer()
-                                ->nullable()
-                                ->required(),
+                        'source_message_id' => $schema
+                            ->integer()
+                            ->nullable()
+                            ->required(),
                     ])
                 )
                 ->required(),

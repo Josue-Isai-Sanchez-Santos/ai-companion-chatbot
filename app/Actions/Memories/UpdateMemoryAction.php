@@ -40,8 +40,7 @@ class UpdateMemoryAction
 
         if ($attributes === []) {
             throw ValidationException::withMessages([
-                'memory' =>
-                    'No se proporcionaron cambios para la memoria.',
+                'memory' => 'No se proporcionaron cambios para la memoria.',
             ]);
         }
 
@@ -149,8 +148,7 @@ class UpdateMemoryAction
                 === null
         ) {
             throw ValidationException::withMessages([
-                'expires_at' =>
-                    'Una memoria temporal necesita una fecha de expiración.',
+                'expires_at' => 'Una memoria temporal necesita una fecha de expiración.',
             ]);
         }
 

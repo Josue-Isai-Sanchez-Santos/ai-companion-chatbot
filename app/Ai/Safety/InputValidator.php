@@ -27,8 +27,7 @@ final class InputValidator
             )
         ) {
             throw ValidationException::withMessages([
-                'message' =>
-                    'El mensaje contiene texto inválido.',
+                'message' => 'El mensaje contiene texto inválido.',
             ]);
         }
 
@@ -43,18 +42,16 @@ final class InputValidator
             ) === 1
         ) {
             throw ValidationException::withMessages([
-                'message' =>
-                    'El mensaje contiene caracteres de control no permitidos.',
+                'message' => 'El mensaje contiene caracteres de control no permitidos.',
             ]);
         }
 
         $validated =
             Validator::make(
                 [
-                    'message' =>
-                        trim(
-                            $content
-                        ),
+                    'message' => trim(
+                        $content
+                    ),
                 ],
                 SendMessageRequest::messageRules(),
                 SendMessageRequest::messageValidationMessages()

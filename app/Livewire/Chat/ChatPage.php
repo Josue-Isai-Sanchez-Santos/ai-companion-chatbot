@@ -241,8 +241,7 @@ class ChatPage extends Component
             'conversations' => $conversations,
             'selectedConversation' => $selectedConversation,
 
-            'portraitPath' =>
-                $profile->currentExpression?->image_path
+            'portraitPath' => $profile->currentExpression?->image_path
                 ?: $profile->character->avatar_path,
 
             'moodLabel' => $this->moodLabel(

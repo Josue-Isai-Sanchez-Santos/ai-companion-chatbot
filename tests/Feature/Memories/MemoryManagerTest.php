@@ -106,23 +106,17 @@ class MemoryManagerTest extends TestCase
             $user,
             $profile,
             [
-                'type' =>
-                    $type,
+                'type' => $type,
 
-                'content' =>
-                    $content,
+                'content' => $content,
 
-                'importance' =>
-                    0.8,
+                'importance' => 0.8,
 
-                'confidence' =>
-                    0.95,
+                'confidence' => 0.95,
 
-                'embedding' =>
-                    $embedding,
+                'embedding' => $embedding,
 
-                'source_message_id' =>
-                    $sourceMessageId,
+                'source_message_id' => $sourceMessageId,
             ]
         );
     }
@@ -147,29 +141,24 @@ class MemoryManagerTest extends TestCase
         $conversation = $profile
             ->conversations()
             ->create([
-                'title' =>
-                    'Origen de memoria',
+                'title' => 'Origen de memoria',
             ]);
 
         $message = $conversation
             ->messages()
             ->create([
-                'role' =>
-                    MessageRole::User,
+                'role' => MessageRole::User,
 
-                'content' =>
-                    'Este mensaje originó la memoria.',
+                'content' => 'Este mensaje originó la memoria.',
 
-                'status' =>
-                    Message::STATUS_COMPLETED,
+                'status' => Message::STATUS_COMPLETED,
             ]);
 
         $this->createMemory(
             $owner,
             $profile,
             'Memoria propia.',
-            sourceMessageId:
-                $message->id
+            sourceMessageId: $message->id
         );
 
         $this->createMemory(
@@ -407,8 +396,7 @@ class MemoryManagerTest extends TestCase
                 $user,
                 $profile,
                 'El usuario trabaja con Laravel.',
-                embedding:
-                    $this->axis(0)
+                embedding: $this->axis(0)
             );
 
         $this->fakeEmbedding(
@@ -486,8 +474,7 @@ class MemoryManagerTest extends TestCase
         $this->assertDatabaseMissing(
             'memories',
             [
-                'id' =>
-                    $memory->id,
+                'id' => $memory->id,
             ]
         );
     }

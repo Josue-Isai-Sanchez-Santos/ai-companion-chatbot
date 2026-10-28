@@ -129,8 +129,7 @@ final class RelationshipUpdater
                 $applied = [];
 
                 foreach (
-                    self::METRICS
-                    as $metric
+                    self::METRICS as $metric
                 ) {
                     $before[$metric] =
                         (int)
@@ -179,8 +178,7 @@ final class RelationshipUpdater
                     )->every(
                         static fn (
                             int $delta
-                        ): bool =>
-                            $delta === 0
+                        ): bool => $delta === 0
                     )
                 ) {
                     return null;
@@ -203,100 +201,72 @@ final class RelationshipUpdater
 
                 $lockedProfile
                     ->forceFill([
-                        'trust' =>
-                            $after['trust'],
+                        'trust' => $after['trust'],
 
-                        'affection' =>
-                            $after['affection'],
+                        'affection' => $after['affection'],
 
-                        'familiarity' =>
-                            $after['familiarity'],
+                        'familiarity' => $after['familiarity'],
 
-                        'tension' =>
-                            $after['tension'],
+                        'tension' => $after['tension'],
 
-                        'relationship_stage' =>
-                            $toStage,
+                        'relationship_stage' => $toStage,
                     ])
                     ->save();
 
                 return RelationshipEvent::query()
                     ->create([
-                        'user_character_profile_id' =>
-                            $lockedProfile->id,
+                        'user_character_profile_id' => $lockedProfile->id,
 
-                        'conversation_id' =>
-                            $conversation->id,
+                        'conversation_id' => $conversation->id,
 
-                        'user_message_id' =>
-                            $userMessage->id,
+                        'user_message_id' => $userMessage->id,
 
-                        'assistant_message_id' =>
-                            $assistantMessage->id,
+                        'assistant_message_id' => $assistantMessage->id,
 
-                        'event_summary' =>
-                            Str::limit(
-                                trim(
-                                    $change
-                                        ->eventSummary
-                                ),
-                                500,
-                                ''
+                        'event_summary' => Str::limit(
+                            trim(
+                                $change
+                                    ->eventSummary
                             ),
+                            500,
+                            ''
+                        ),
 
-                        'from_stage' =>
-                            $fromStage,
+                        'from_stage' => $fromStage,
 
-                        'to_stage' =>
-                            $toStage,
+                        'to_stage' => $toStage,
 
-                        'requested_trust_delta' =>
-                            $requested['trust'],
+                        'requested_trust_delta' => $requested['trust'],
 
-                        'applied_trust_delta' =>
-                            $applied['trust'],
+                        'applied_trust_delta' => $applied['trust'],
 
-                        'trust_before' =>
-                            $before['trust'],
+                        'trust_before' => $before['trust'],
 
-                        'trust_after' =>
-                            $after['trust'],
+                        'trust_after' => $after['trust'],
 
-                        'requested_affection_delta' =>
-                            $requested['affection'],
+                        'requested_affection_delta' => $requested['affection'],
 
-                        'applied_affection_delta' =>
-                            $applied['affection'],
+                        'applied_affection_delta' => $applied['affection'],
 
-                        'affection_before' =>
-                            $before['affection'],
+                        'affection_before' => $before['affection'],
 
-                        'affection_after' =>
-                            $after['affection'],
+                        'affection_after' => $after['affection'],
 
-                        'requested_familiarity_delta' =>
-                            $requested['familiarity'],
+                        'requested_familiarity_delta' => $requested['familiarity'],
 
-                        'applied_familiarity_delta' =>
-                            $applied['familiarity'],
+                        'applied_familiarity_delta' => $applied['familiarity'],
 
-                        'familiarity_before' =>
-                            $before['familiarity'],
+                        'familiarity_before' => $before['familiarity'],
 
-                        'familiarity_after' =>
-                            $after['familiarity'],
+                        'familiarity_after' => $after['familiarity'],
 
-                        'requested_tension_delta' =>
-                            $requested['tension'],
+                        'requested_tension_delta' => $requested['tension'],
 
-                        'applied_tension_delta' =>
-                            $applied['tension'],
+                        'applied_tension_delta' => $applied['tension'],
 
-                        'tension_before' =>
-                            $before['tension'],
+                        'tension_before' => $before['tension'],
 
-                        'tension_after' =>
-                            $after['tension'],
+                        'tension_after' => $after['tension'],
                     ]);
             }
         );
@@ -338,8 +308,7 @@ final class RelationshipUpdater
             RelationshipStage::Strangers;
 
         foreach (
-            RelationshipStage::cases()
-            as $stage
+            RelationshipStage::cases() as $stage
         ) {
             $thresholds =
                 config(

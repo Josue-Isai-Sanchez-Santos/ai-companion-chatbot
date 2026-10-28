@@ -97,16 +97,13 @@ final class VersionOneCriticalFlowTest extends TestCase
 
         $fake->replyWith(
             new GeneratedReply(
-                content:
-                    'Respuesta generada sin proveedor externo.',
+                content: 'Respuesta generada sin proveedor externo.',
 
                 metadata: [
-                    'test' =>
-                        true,
+                    'test' => true,
                 ],
 
-                tokenCount:
-                    7
+                tokenCount: 7
             )
         );
 

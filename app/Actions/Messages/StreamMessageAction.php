@@ -43,12 +43,11 @@ class StreamMessageAction
         );
 
         $validated = [
-            'message' =>
-                $this
-                    ->inputValidator
-                    ->validateMessage(
-                        $content
-                    ),
+            'message' => $this
+                ->inputValidator
+                ->validateMessage(
+                    $content
+                ),
         ];
 
         $this
@@ -199,8 +198,7 @@ class StreamMessageAction
                     )
                 ) {
                     throw ValidationException::withMessages([
-                        'assistant_message_id' =>
-                            'Esta respuesta no se puede reintentar.',
+                        'assistant_message_id' => 'Esta respuesta no se puede reintentar.',
                     ]);
                 }
 
@@ -533,8 +531,7 @@ class StreamMessageAction
 
         if ($query->exists()) {
             throw ValidationException::withMessages([
-                'message' =>
-                    'Ya hay una respuesta en curso para esta conversación.',
+                'message' => 'Ya hay una respuesta en curso para esta conversación.',
             ]);
         }
     }

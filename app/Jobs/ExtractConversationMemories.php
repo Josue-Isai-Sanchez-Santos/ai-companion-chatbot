@@ -8,9 +8,7 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
-final class ExtractConversationMemories implements
-    ShouldQueue,
-    ShouldBeUnique
+final class ExtractConversationMemories implements ShouldBeUnique, ShouldQueue
 {
     use Queueable;
 

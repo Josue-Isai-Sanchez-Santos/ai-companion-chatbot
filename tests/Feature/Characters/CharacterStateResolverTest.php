@@ -55,9 +55,6 @@ class CharacterStateResolverTest extends TestCase
         );
     }
 
-    /**
-     * @return RelationshipEvent
-     */
     private function relationshipEvent(
         UserCharacterProfile $profile,
         int $trust = 0,
@@ -69,39 +66,31 @@ class CharacterStateResolverTest extends TestCase
             $profile
                 ->conversations()
                 ->create([
-                    'title' =>
-                        'State resolver test',
+                    'title' => 'State resolver test',
                 ]);
 
         $userMessage =
             $conversation
                 ->messages()
                 ->create([
-                    'role' =>
-                        MessageRole::User,
+                    'role' => MessageRole::User,
 
-                    'content' =>
-                        'Mensaje del usuario.',
+                    'content' => 'Mensaje del usuario.',
 
-                    'status' =>
-                        Message::STATUS_COMPLETED,
+                    'status' => Message::STATUS_COMPLETED,
                 ]);
 
         $assistant =
             $conversation
                 ->messages()
                 ->create([
-                    'parent_message_id' =>
-                        $userMessage->id,
+                    'parent_message_id' => $userMessage->id,
 
-                    'role' =>
-                        MessageRole::Assistant,
+                    'role' => MessageRole::Assistant,
 
-                    'content' =>
-                        'Respuesta del personaje.',
+                    'content' => 'Respuesta del personaje.',
 
-                    'status' =>
-                        Message::STATUS_COMPLETED,
+                    'status' => Message::STATUS_COMPLETED,
                 ]);
 
         $event = app(
@@ -113,16 +102,11 @@ class CharacterStateResolverTest extends TestCase
             $assistant,
             new RelationshipChange(
                 significant: true,
-                eventSummary:
-                    'Evento significativo para prueba.',
-                trustDelta:
-                    $trust,
-                affectionDelta:
-                    $affection,
-                familiarityDelta:
-                    $familiarity,
-                tensionDelta:
-                    $tension,
+                eventSummary: 'Evento significativo para prueba.',
+                trustDelta: $trust,
+                affectionDelta: $affection,
+                familiarityDelta: $familiarity,
+                tensionDelta: $tension,
             )
         );
 
@@ -163,14 +147,11 @@ class CharacterStateResolverTest extends TestCase
             $character
                 ->expressions()
                 ->create([
-                    'name' =>
-                        CharacterMood::Neutral->value,
+                    'name' => CharacterMood::Neutral->value,
 
-                    'description' =>
-                        'Neutral.',
+                    'description' => 'Neutral.',
 
-                    'is_default' =>
-                        true,
+                    'is_default' => true,
                 ]);
 
         $resolved = app(
@@ -363,11 +344,9 @@ class CharacterStateResolverTest extends TestCase
                 ->firstOrFail();
 
         $profile->update([
-            'current_mood' =>
-                CharacterMood::Happy,
+            'current_mood' => CharacterMood::Happy,
 
-            'current_expression_id' =>
-                $happy->id,
+            'current_expression_id' => $happy->id,
         ]);
 
         $resolved = app(

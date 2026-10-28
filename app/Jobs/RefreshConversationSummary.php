@@ -14,9 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Laravel\Ai\Responses\StructuredAgentResponse;
 use LogicException;
 
-final class RefreshConversationSummary implements
-    ShouldQueue,
-    ShouldBeUnique
+final class RefreshConversationSummary implements ShouldBeUnique, ShouldQueue
 {
     use Queueable;
 
@@ -200,14 +198,11 @@ final class RefreshConversationSummary implements
                 static fn (
                     Message $message
                 ): array => [
-                    'id' =>
-                        $message->id,
+                    'id' => $message->id,
 
-                    'role' =>
-                        $message->role->value,
+                    'role' => $message->role->value,
 
-                    'content' =>
-                        $message->content,
+                    'content' => $message->content,
                 ]
             )
             ->values()
@@ -229,20 +224,17 @@ final class RefreshConversationSummary implements
                     $maxCharacters
                 ),
 
-                provider:
-                    $this->provider(),
+                provider: $this->provider(),
 
-                model:
-                    $this->model(),
+                model: $this->model(),
 
-                timeout:
-                    max(
-                        1,
-                        (int) config(
-                            'chatbot.summary.timeout',
-                            120
-                        )
+                timeout: max(
+                    1,
+                    (int) config(
+                        'chatbot.summary.timeout',
+                        120
                     )
+                )
             );
 
         if (
@@ -279,8 +271,7 @@ final class RefreshConversationSummary implements
                 ->map(
                     static fn (
                         mixed $id
-                    ): int =>
-                        (int) $id
+                    ): int => (int) $id
                 )
                 ->all();
 
@@ -340,17 +331,15 @@ final class RefreshConversationSummary implements
                 }
 
                 $conversation->forceFill([
-                    'summary' =>
-                        $summary,
+                    'summary' => $summary,
 
                     /*
                      * This is the timestamp of the
                      * latest message covered by this
                      * summary, not simply now().
                      */
-                    'summary_updated_at' =>
-                        $coveredThrough
-                            ->created_at,
+                    'summary_updated_at' => $coveredThrough
+                        ->created_at,
                 ])->save();
             }
         );

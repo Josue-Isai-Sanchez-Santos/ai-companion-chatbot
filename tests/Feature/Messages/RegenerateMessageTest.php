@@ -15,7 +15,7 @@ use App\Enums\CharacterMood;
 use App\Enums\MemoryType;
 use App\Enums\MessageRole;
 use App\Models\Character;
-use App\Models\Memory;
+use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\User;
 use App\Models\UserCharacterProfile;
@@ -72,7 +72,7 @@ class RegenerateMessageTest extends TestCase
     /**
      * @return array{
      *     0: UserCharacterProfile,
-     *     1: \App\Models\Conversation,
+     *     1: Conversation,
      *     2: Message,
      *     3: Message
      * }
@@ -89,45 +89,35 @@ class RegenerateMessageTest extends TestCase
             $profile
                 ->conversations()
                 ->create([
-                    'title' =>
-                        'Regeneration test',
+                    'title' => 'Regeneration test',
                 ]);
 
         $userMessage =
             $conversation
                 ->messages()
                 ->create([
-                    'role' =>
-                        MessageRole::User,
+                    'role' => MessageRole::User,
 
-                    'content' =>
-                        'Dame una respuesta.',
+                    'content' => 'Dame una respuesta.',
 
-                    'status' =>
-                        Message::STATUS_COMPLETED,
+                    'status' => Message::STATUS_COMPLETED,
 
-                    'is_active_branch' =>
-                        true,
+                    'is_active_branch' => true,
                 ]);
 
         $assistant =
             $conversation
                 ->messages()
                 ->create([
-                    'parent_message_id' =>
-                        $userMessage->id,
+                    'parent_message_id' => $userMessage->id,
 
-                    'role' =>
-                        MessageRole::Assistant,
+                    'role' => MessageRole::Assistant,
 
-                    'content' =>
-                        'RESPUESTA_ANTERIOR',
+                    'content' => 'RESPUESTA_ANTERIOR',
 
-                    'status' =>
-                        Message::STATUS_COMPLETED,
+                    'status' => Message::STATUS_COMPLETED,
 
-                    'is_active_branch' =>
-                        true,
+                    'is_active_branch' => true,
                 ]);
 
         return [
@@ -161,8 +151,7 @@ class RegenerateMessageTest extends TestCase
 
         $fake->replyWith(
             new GeneratedReply(
-                content:
-                    'RESPUESTA_ALTERNATIVA'
+                content: 'RESPUESTA_ALTERNATIVA'
             )
         );
 
@@ -255,8 +244,7 @@ class RegenerateMessageTest extends TestCase
 
         $fake->replyWith(
             new GeneratedReply(
-                content:
-                    'RAMA_ACTIVA'
+                content: 'RAMA_ACTIVA'
             )
         );
 
@@ -315,12 +303,10 @@ class RegenerateMessageTest extends TestCase
 
         $conversation
             ->forceFill([
-                'summary' =>
-                    'SUMMARY_WITH_OLD_BRANCH',
+                'summary' => 'SUMMARY_WITH_OLD_BRANCH',
 
-                'summary_updated_at' =>
-                    $previous
-                        ->created_at,
+                'summary_updated_at' => $previous
+                    ->created_at,
             ])
             ->save();
 
@@ -329,8 +315,7 @@ class RegenerateMessageTest extends TestCase
 
         $fake->replyWith(
             new GeneratedReply(
-                content:
-                    'NUEVA_RESPUESTA'
+                content: 'NUEVA_RESPUESTA'
             )
         );
 
@@ -383,8 +368,7 @@ class RegenerateMessageTest extends TestCase
             $previous,
             new RelationshipChange(
                 significant: true,
-                eventSummary:
-                    'Se fortaleció la confianza.',
+                eventSummary: 'Se fortaleció la confianza.',
                 trustDelta: 3,
                 affectionDelta: 2,
                 familiarityDelta: 0,
@@ -420,8 +404,7 @@ class RegenerateMessageTest extends TestCase
 
         $fake->replyWith(
             new GeneratedReply(
-                content:
-                    'RESPUESTA_REGENERADA'
+                content: 'RESPUESTA_REGENERADA'
             )
         );
 
@@ -466,8 +449,7 @@ class RegenerateMessageTest extends TestCase
         $this->assertDatabaseMissing(
             'relationship_events',
             [
-                'assistant_message_id' =>
-                    $result[
+                'assistant_message_id' => $result[
                         'assistant'
                     ]->id,
             ]
@@ -494,39 +476,29 @@ class RegenerateMessageTest extends TestCase
             $conversation
                 ->messages()
                 ->create([
-                    'parent_message_id' =>
-                        $firstAssistant->id,
+                    'parent_message_id' => $firstAssistant->id,
 
-                    'role' =>
-                        MessageRole::User,
+                    'role' => MessageRole::User,
 
-                    'content' =>
-                        'Segundo mensaje.',
+                    'content' => 'Segundo mensaje.',
 
-                    'status' =>
-                        Message::STATUS_COMPLETED,
+                    'status' => Message::STATUS_COMPLETED,
 
-                    'is_active_branch' =>
-                        true,
+                    'is_active_branch' => true,
                 ]);
 
         $conversation
             ->messages()
             ->create([
-                'parent_message_id' =>
-                    $secondUser->id,
+                'parent_message_id' => $secondUser->id,
 
-                'role' =>
-                    MessageRole::Assistant,
+                'role' => MessageRole::Assistant,
 
-                'content' =>
-                    'Segunda respuesta.',
+                'content' => 'Segunda respuesta.',
 
-                'status' =>
-                    Message::STATUS_COMPLETED,
+                'status' => Message::STATUS_COMPLETED,
 
-                'is_active_branch' =>
-                    true,
+                'is_active_branch' => true,
             ]);
 
         $this->expectException(
@@ -558,66 +530,49 @@ class RegenerateMessageTest extends TestCase
             );
 
         $previous->update([
-            'is_active_branch' =>
-                false,
+            'is_active_branch' => false,
         ]);
 
         $inactiveUser =
             $conversation
                 ->messages()
                 ->create([
-                    'parent_message_id' =>
-                        $previous->id,
+                    'parent_message_id' => $previous->id,
 
-                    'role' =>
-                        MessageRole::User,
+                    'role' => MessageRole::User,
 
-                    'content' =>
-                        'Inactive user.',
-                    'status' =>
-                        Message::STATUS_COMPLETED,
-                    'is_active_branch' =>
-                        false,
+                    'content' => 'Inactive user.',
+                    'status' => Message::STATUS_COMPLETED,
+                    'is_active_branch' => false,
                 ]);
 
         $inactiveAssistant =
             $conversation
                 ->messages()
                 ->create([
-                    'parent_message_id' =>
-                        $inactiveUser->id,
+                    'parent_message_id' => $inactiveUser->id,
 
-                    'role' =>
-                        MessageRole::Assistant,
+                    'role' => MessageRole::Assistant,
 
-                    'content' =>
-                        'Inactive assistant.',
-                    'status' =>
-                        Message::STATUS_COMPLETED,
-                    'is_active_branch' =>
-                        false,
+                    'content' => 'Inactive assistant.',
+                    'status' => Message::STATUS_COMPLETED,
+                    'is_active_branch' => false,
                 ]);
 
         $profile
             ->memories()
             ->create([
-                'source_message_id' =>
-                    $inactiveAssistant->id,
+                'source_message_id' => $inactiveAssistant->id,
 
-                'type' =>
-                    MemoryType::CharacterFact,
+                'type' => MemoryType::CharacterFact,
 
-                'content' =>
-                    'Inactive branch memory.',
+                'content' => 'Inactive branch memory.',
 
-                'importance' =>
-                    0.8,
+                'importance' => 0.8,
 
-                'confidence' =>
-                    1.0,
+                'confidence' => 1.0,
 
-                'embedding' =>
-                    null,
+                'embedding' => null,
             ]);
 
         $deleted = app(
@@ -635,24 +590,21 @@ class RegenerateMessageTest extends TestCase
         $this->assertDatabaseMissing(
             'messages',
             [
-                'id' =>
-                    $previous->id,
+                'id' => $previous->id,
             ]
         );
 
         $this->assertDatabaseMissing(
             'messages',
             [
-                'id' =>
-                    $inactiveAssistant->id,
+                'id' => $inactiveAssistant->id,
             ]
         );
 
         $this->assertDatabaseMissing(
             'memories',
             [
-                'content' =>
-                    'Inactive branch memory.',
+                'content' => 'Inactive branch memory.',
             ]
         );
     }

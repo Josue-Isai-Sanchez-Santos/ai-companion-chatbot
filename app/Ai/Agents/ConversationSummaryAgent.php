@@ -8,9 +8,7 @@ use Laravel\Ai\Contracts\HasStructuredOutput;
 use Laravel\Ai\Promptable;
 use Stringable;
 
-final class ConversationSummaryAgent implements
-    Agent,
-    HasStructuredOutput
+final class ConversationSummaryAgent implements Agent, HasStructuredOutput
 {
     use Promptable;
 

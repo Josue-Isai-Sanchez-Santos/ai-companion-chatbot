@@ -156,11 +156,9 @@ final class CharacterStateResolver
         }
 
         $profile->forceFill([
-            'current_mood' =>
-                $resolvedMood,
+            'current_mood' => $resolvedMood,
 
-            'current_expression_id' =>
-                $expression->id,
+            'current_expression_id' => $expression->id,
         ])->save();
 
         return $profile

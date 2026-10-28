@@ -49,8 +49,7 @@ final class ChatSafetyPolicy
                 );
 
             throw ValidationException::withMessages([
-                'message' =>
-                    "Demasiadas solicitudes. Intenta de nuevo en {$retryAfter} segundos.",
+                'message' => "Demasiadas solicitudes. Intenta de nuevo en {$retryAfter} segundos.",
             ]);
         }
 
@@ -64,8 +63,7 @@ final class ChatSafetyPolicy
         string $content
     ): bool {
         foreach (
-            self::INTERNAL_PROMPT_MARKERS
-            as $marker
+            self::INTERNAL_PROMPT_MARKERS as $marker
         ) {
             if (
                 stripos(

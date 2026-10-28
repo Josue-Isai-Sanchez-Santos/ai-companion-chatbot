@@ -84,11 +84,10 @@ final class MemoryRanker
             ->sortByDesc(
                 static fn (
                     Memory $memory
-                ): float =>
-                    (float) $memory
-                        ->getAttribute(
-                            'retrieval_score'
-                        )
+                ): float => (float) $memory
+                    ->getAttribute(
+                        'retrieval_score'
+                    )
             )
             ->values();
     }

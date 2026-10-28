@@ -24,26 +24,19 @@ final class ResetAudit extends Model
     protected function casts(): array
     {
         return [
-            'previous_profile_id' =>
-                'integer',
+            'previous_profile_id' => 'integer',
 
-            'new_profile_id' =>
-                'integer',
+            'new_profile_id' => 'integer',
 
-            'deleted_conversations' =>
-                'integer',
+            'deleted_conversations' => 'integer',
 
-            'deleted_messages' =>
-                'integer',
+            'deleted_messages' => 'integer',
 
-            'deleted_memories' =>
-                'integer',
+            'deleted_memories' => 'integer',
 
-            'deleted_relationship_events' =>
-                'integer',
+            'deleted_relationship_events' => 'integer',
 
-            'reset_at' =>
-                'datetime',
+            'reset_at' => 'datetime',
         ];
     }
 

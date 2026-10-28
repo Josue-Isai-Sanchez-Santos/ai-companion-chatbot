@@ -17,9 +17,7 @@ use Illuminate\Foundation\Queue\Queueable;
 use Laravel\Ai\Responses\StructuredAgentResponse;
 use LogicException;
 
-final class UpdateRelationshipState implements
-    ShouldQueue,
-    ShouldBeUnique
+final class UpdateRelationshipState implements ShouldBeUnique, ShouldQueue
 {
     use Queueable;
 
@@ -162,20 +160,17 @@ final class UpdateRelationshipState implements
                     $assistant
                 ),
 
-                provider:
-                    $this->provider(),
+                provider: $this->provider(),
 
-                model:
-                    $this->model(),
+                model: $this->model(),
 
-                timeout:
-                    max(
-                        1,
-                        (int) config(
-                            'relationship.analysis.timeout',
-                            120
-                        )
+                timeout: max(
+                    1,
+                    (int) config(
+                        'relationship.analysis.timeout',
+                        120
                     )
+                )
             );
 
         if (
@@ -189,38 +184,32 @@ final class UpdateRelationshipState implements
 
         $change =
             RelationshipChange::fromArray([
-                'significant' =>
-                    $response[
+                'significant' => $response[
                         'significant'
                     ]
                     ?? false,
 
-                'event_summary' =>
-                    $response[
+                'event_summary' => $response[
                         'event_summary'
                     ]
                     ?? '',
 
-                'trust_delta' =>
-                    $response[
+                'trust_delta' => $response[
                         'trust_delta'
                     ]
                     ?? 0,
 
-                'affection_delta' =>
-                    $response[
+                'affection_delta' => $response[
                         'affection_delta'
                     ]
                     ?? 0,
 
-                'familiarity_delta' =>
-                    $response[
+                'familiarity_delta' => $response[
                         'familiarity_delta'
                     ]
                     ?? 0,
 
-                'tension_delta' =>
-                    $response[
+                'tension_delta' => $response[
                         'tension_delta'
                     ]
                     ?? 0,

@@ -42,11 +42,9 @@ return [
         ),
 
         'drivers' => [
-            'simulated' =>
-                SimulatedChatGateway::class,
+            'simulated' => SimulatedChatGateway::class,
 
-            'laravel' =>
-                LaravelAiGateway::class,
+            'laravel' => LaravelAiGateway::class,
         ],
     ],
 
@@ -83,11 +81,9 @@ return [
         ),
 
         'drivers' => [
-            'simulated' =>
-                SimulatedEmbeddingGateway::class,
+            'simulated' => SimulatedEmbeddingGateway::class,
 
-            'laravel' =>
-                LaravelAiEmbeddingGateway::class,
+            'laravel' => LaravelAiEmbeddingGateway::class,
         ],
     ],
 

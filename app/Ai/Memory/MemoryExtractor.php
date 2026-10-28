@@ -109,8 +109,7 @@ final class MemoryExtractor
             ->keyBy(
                 static fn (
                     Message $message
-                ): int =>
-                    $message->id
+                ): int => $message->id
             );
 
         $response = $this
@@ -119,18 +118,15 @@ final class MemoryExtractor
                 $this->buildPrompt(
                     $messages
                 ),
-                provider:
-                    $this->provider(),
-                model:
-                    $this->model(),
-                timeout:
-                    max(
-                        1,
-                        (int) config(
-                            'memory.extraction.timeout',
-                            120
-                        )
+                provider: $this->provider(),
+                model: $this->model(),
+                timeout: max(
+                    1,
+                    (int) config(
+                        'memory.extraction.timeout',
+                        120
                     )
+                )
             );
 
         if (
@@ -209,8 +205,7 @@ final class MemoryExtractor
                     ->map(
                         static fn (
                             mixed $id
-                        ): int =>
-                            (int) $id
+                        ): int => (int) $id
                     )
                     ->all(),
                 true
@@ -455,8 +450,7 @@ final class MemoryExtractor
                         );
 
                 foreach (
-                    $existingContents
-                    as $existingContent
+                    $existingContents as $existingContent
                 ) {
                     if (
                         $this->fingerprint(
@@ -490,8 +484,7 @@ final class MemoryExtractor
                         ->whereVectorSimilarTo(
                             'embedding',
                             $embedding,
-                            minSimilarity:
-                                $duplicateSimilarity
+                            minSimilarity: $duplicateSimilarity
                         )
                         ->exists();
 
@@ -505,23 +498,17 @@ final class MemoryExtractor
                         $user,
                         $lockedProfile,
                         [
-                            'source_message_id' =>
-                                $sourceMessageId,
+                            'source_message_id' => $sourceMessageId,
 
-                            'type' =>
-                                $candidate->type,
+                            'type' => $candidate->type,
 
-                            'content' =>
-                                $candidate->content,
+                            'content' => $candidate->content,
 
-                            'importance' =>
-                                $candidate->importance,
+                            'importance' => $candidate->importance,
 
-                            'confidence' =>
-                                $candidate->confidence,
+                            'confidence' => $candidate->confidence,
 
-                            'embedding' =>
-                                $embedding,
+                            'embedding' => $embedding,
                         ]
                     );
             }
@@ -576,20 +563,15 @@ final class MemoryExtractor
         }
 
         return new ExtractedMemory(
-            type:
-                MemoryType::UserPreference,
+            type: MemoryType::UserPreference,
 
-            content:
-                $candidate->content,
+            content: $candidate->content,
 
-            importance:
-                $candidate->importance,
+            importance: $candidate->importance,
 
-            confidence:
-                $candidate->confidence,
+            confidence: $candidate->confidence,
 
-            sourceMessageId:
-                $candidate->sourceMessageId,
+            sourceMessageId: $candidate->sourceMessageId,
         );
     }
 

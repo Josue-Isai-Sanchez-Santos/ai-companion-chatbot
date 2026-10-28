@@ -103,8 +103,7 @@ final class RegenerateMessageAction
                         $user,
                         $preparedConversation,
                         $userMessage->content,
-                        persistedMessage:
-                            $userMessage
+                        persistedMessage: $userMessage
                     );
 
             if (
@@ -123,19 +122,16 @@ final class RegenerateMessageAction
                 );
 
             return [
-                'previous' =>
-                    Message::query()
-                        ->findOrFail(
-                            $preparation[
-                                'previous_assistant_id'
-                            ]
-                        ),
+                'previous' => Message::query()
+                    ->findOrFail(
+                        $preparation[
+                            'previous_assistant_id'
+                        ]
+                    ),
 
-                'assistant' =>
-                    $replacement,
+                'assistant' => $replacement,
 
-                'error' =>
-                    null,
+                'error' => null,
             ];
         } catch (Throwable $exception) {
             $this->rollback(
@@ -151,19 +147,16 @@ final class RegenerateMessageAction
                 );
 
                 return [
-                    'previous' =>
-                        Message::query()
-                            ->findOrFail(
-                                $preparation[
-                                    'previous_assistant_id'
-                                ]
-                            ),
+                    'previous' => Message::query()
+                        ->findOrFail(
+                            $preparation[
+                                'previous_assistant_id'
+                            ]
+                        ),
 
-                    'assistant' =>
-                        null,
+                    'assistant' => null,
 
-                    'error' =>
-                        'No fue posible regenerar la respuesta. '
+                    'error' => 'No fue posible regenerar la respuesta. '
                         .'La respuesta anterior continúa seleccionada.',
                 ];
             }
@@ -250,14 +243,12 @@ final class RegenerateMessageAction
                         ->first();
 
                 $profileSnapshot = [
-                    'mood' =>
-                        $profile
-                            ->current_mood
-                            ->value,
+                    'mood' => $profile
+                        ->current_mood
+                        ->value,
 
-                    'expression_id' =>
-                        $profile
-                            ->current_expression_id,
+                    'expression_id' => $profile
+                        ->current_expression_id,
                 ];
 
                 if (
@@ -272,25 +263,20 @@ final class RegenerateMessageAction
                      * before this response.
                      */
                     $profile->forceFill([
-                        'trust' =>
-                            $relationshipEvent
-                                ->trust_before,
+                        'trust' => $relationshipEvent
+                            ->trust_before,
 
-                        'affection' =>
-                            $relationshipEvent
-                                ->affection_before,
+                        'affection' => $relationshipEvent
+                            ->affection_before,
 
-                        'familiarity' =>
-                            $relationshipEvent
-                                ->familiarity_before,
+                        'familiarity' => $relationshipEvent
+                            ->familiarity_before,
 
-                        'tension' =>
-                            $relationshipEvent
-                                ->tension_before,
+                        'tension' => $relationshipEvent
+                            ->tension_before,
 
-                        'relationship_stage' =>
-                            $relationshipEvent
-                                ->from_stage,
+                        'relationship_stage' => $relationshipEvent
+                            ->from_stage,
                     ])->save();
                 }
 
@@ -324,30 +310,25 @@ final class RegenerateMessageAction
                      */
                     $lockedConversation
                         ->forceFill([
-                            'summary' =>
-                                null,
+                            'summary' => null,
 
-                            'summary_updated_at' =>
-                                null,
+                            'summary_updated_at' => null,
                         ])
                         ->save();
                 }
 
                 $lockedAssistant
                     ->forceFill([
-                        'is_active_branch' =>
-                            false,
+                        'is_active_branch' => false,
                     ])
                     ->save();
 
                 $replacementMetadata = [
                     'regeneration' => [
-                        'replaces_message_id' =>
-                            $lockedAssistant->id,
+                        'replaces_message_id' => $lockedAssistant->id,
 
-                        'started_at' =>
-                            now()
-                                ->toISOString(),
+                        'started_at' => now()
+                            ->toISOString(),
                     ],
                 ];
 
@@ -355,71 +336,52 @@ final class RegenerateMessageAction
                     $lockedConversation
                         ->messages()
                         ->create([
-                            'parent_message_id' =>
-                                $userMessage->id,
+                            'parent_message_id' => $userMessage->id,
 
-                            'role' =>
-                                MessageRole::Assistant,
+                            'role' => MessageRole::Assistant,
 
-                            'content' =>
-                                '',
+                            'content' => '',
 
-                            'metadata' =>
-                                $replacementMetadata,
+                            'metadata' => $replacementMetadata,
 
-                            'token_count' =>
-                                null,
+                            'token_count' => null,
 
-                            'status' =>
-                                Message::STATUS_STREAMING,
+                            'status' => Message::STATUS_STREAMING,
 
-                            'is_active_branch' =>
-                                true,
+                            'is_active_branch' => true,
                         ]);
 
                 $lockedConversation
                     ->forceFill([
-                        'last_message_at' =>
-                            $replacement
-                                ->created_at,
+                        'last_message_at' => $replacement
+                            ->created_at,
                     ])
                     ->save();
 
                 return [
-                    'conversation_id' =>
-                        $lockedConversation->id,
+                    'conversation_id' => $lockedConversation->id,
 
-                    'profile_id' =>
-                        $profile->id,
+                    'profile_id' => $profile->id,
 
-                    'user_message_id' =>
-                        $userMessage->id,
+                    'user_message_id' => $userMessage->id,
 
-                    'previous_assistant_id' =>
-                        $lockedAssistant->id,
+                    'previous_assistant_id' => $lockedAssistant->id,
 
-                    'replacement_id' =>
-                        $replacement->id,
+                    'replacement_id' => $replacement->id,
 
-                    'relationship_event_id' =>
-                        $relationshipEvent?->id,
+                    'relationship_event_id' => $relationshipEvent?->id,
 
-                    'summary_was_cleared' =>
-                        $summaryWasCleared,
+                    'summary_was_cleared' => $summaryWasCleared,
 
-                    'summary_before' =>
-                        $summaryBefore,
+                    'summary_before' => $summaryBefore,
 
-                    'summary_updated_at_before' =>
-                        $summaryUpdatedAtBefore,
+                    'summary_updated_at_before' => $summaryUpdatedAtBefore,
 
-                    'mood_before' =>
-                        $profileSnapshot[
+                    'mood_before' => $profileSnapshot[
                             'mood'
                         ],
 
-                    'expression_id_before' =>
-                        $profileSnapshot[
+                    'expression_id_before' => $profileSnapshot[
                             'expression_id'
                         ],
                 ];
@@ -481,17 +443,13 @@ final class RegenerateMessageAction
 
                 $replacement
                     ->forceFill([
-                        'content' =>
-                            $reply->content,
+                        'content' => $reply->content,
 
-                        'metadata' =>
-                            $metadata,
+                        'metadata' => $metadata,
 
-                        'token_count' =>
-                            $reply->tokenCount,
+                        'token_count' => $reply->tokenCount,
 
-                        'status' =>
-                            Message::STATUS_COMPLETED,
+                        'status' => Message::STATUS_COMPLETED,
                     ])
                     ->save();
 
@@ -501,9 +459,8 @@ final class RegenerateMessageAction
                             ->conversation_id
                     )
                     ->update([
-                        'last_message_at' =>
-                            $replacement
-                                ->created_at,
+                        'last_message_at' => $replacement
+                            ->created_at,
                     ]);
 
                 /*
@@ -553,8 +510,7 @@ final class RegenerateMessageAction
 
                 $previous
                     ->forceFill([
-                        'is_active_branch' =>
-                            true,
+                        'is_active_branch' => true,
                     ])
                     ->save();
 
@@ -584,25 +540,20 @@ final class RegenerateMessageAction
                     if ($event !== null) {
                         $profile
                             ->forceFill([
-                                'trust' =>
-                                    $event
-                                        ->trust_after,
+                                'trust' => $event
+                                    ->trust_after,
 
-                                'affection' =>
-                                    $event
-                                        ->affection_after,
+                                'affection' => $event
+                                    ->affection_after,
 
-                                'familiarity' =>
-                                    $event
-                                        ->familiarity_after,
+                                'familiarity' => $event
+                                    ->familiarity_after,
 
-                                'tension' =>
-                                    $event
-                                        ->tension_after,
+                                'tension' => $event
+                                    ->tension_after,
 
-                                'relationship_stage' =>
-                                    $event
-                                        ->to_stage,
+                                'relationship_stage' => $event
+                                    ->to_stage,
                             ])
                             ->save();
                     }
@@ -610,13 +561,11 @@ final class RegenerateMessageAction
 
                 $profile
                     ->forceFill([
-                        'current_mood' =>
-                            $preparation[
+                        'current_mood' => $preparation[
                                 'mood_before'
                             ],
 
-                        'current_expression_id' =>
-                            $preparation[
+                        'current_expression_id' => $preparation[
                                 'expression_id_before'
                             ],
                     ])
@@ -639,13 +588,11 @@ final class RegenerateMessageAction
                 ) {
                     $conversation
                         ->forceFill([
-                            'summary' =>
-                                $preparation[
+                            'summary' => $preparation[
                                     'summary_before'
                                 ],
 
-                            'summary_updated_at' =>
-                                $preparation[
+                            'summary_updated_at' => $preparation[
                                     'summary_updated_at_before'
                                 ],
                         ]);
@@ -653,9 +600,8 @@ final class RegenerateMessageAction
 
                 $conversation
                     ->forceFill([
-                        'last_message_at' =>
-                            $previous
-                                ->created_at,
+                        'last_message_at' => $previous
+                            ->created_at,
                     ])
                     ->save();
             }
@@ -753,8 +699,7 @@ final class RegenerateMessageAction
                 ->is_active_branch
         ) {
             throw ValidationException::withMessages([
-                'assistant_message_id' =>
-                    'Esta respuesta no se puede regenerar.',
+                'assistant_message_id' => 'Esta respuesta no se puede regenerar.',
             ]);
         }
 
@@ -777,8 +722,7 @@ final class RegenerateMessageAction
             !== $assistant->id
         ) {
             throw ValidationException::withMessages([
-                'assistant_message_id' =>
-                    'Solo se puede regenerar la última respuesta activa.',
+                'assistant_message_id' => 'Solo se puede regenerar la última respuesta activa.',
             ]);
         }
     }

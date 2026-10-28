@@ -64,11 +64,9 @@ class MemoryStorageTest extends TestCase
             $profile,
             array_replace(
                 [
-                    'type' =>
-                        MemoryType::UserFact,
+                    'type' => MemoryType::UserFact,
 
-                    'content' =>
-                        'El usuario estudia sistemas computacionales.',
+                    'content' => 'El usuario estudia sistemas computacionales.',
                 ],
                 $attributes
             )
@@ -88,8 +86,7 @@ class MemoryStorageTest extends TestCase
             $user,
             $profile,
             [
-                'content' =>
-                    'El usuario prefiere explicaciones detalladas.',
+                'content' => 'El usuario prefiere explicaciones detalladas.',
 
                 'importance' => 0.8,
 
@@ -102,14 +99,11 @@ class MemoryStorageTest extends TestCase
             [
                 'id' => $memory->id,
 
-                'user_character_profile_id' =>
-                    $profile->id,
+                'user_character_profile_id' => $profile->id,
 
-                'type' =>
-                    MemoryType::UserFact->value,
+                'type' => MemoryType::UserFact->value,
 
-                'content' =>
-                    'El usuario prefiere explicaciones detalladas.',
+                'content' => 'El usuario prefiere explicaciones detalladas.',
 
                 'access_count' => 0,
             ]
@@ -160,8 +154,7 @@ class MemoryStorageTest extends TestCase
             $user,
             $profile,
             [
-                'embedding' =>
-                    $embedding,
+                'embedding' => $embedding,
             ]
         )->fresh();
 
@@ -216,8 +209,7 @@ class MemoryStorageTest extends TestCase
             $user,
             $memory,
             [
-                'content' =>
-                    'El usuario trabaja con sistemas computacionales.',
+                'content' => 'El usuario trabaja con sistemas computacionales.',
 
                 'importance' => 0.9,
             ]
@@ -317,8 +309,7 @@ class MemoryStorageTest extends TestCase
             $intruder,
             $memory,
             [
-                'content' =>
-                    'Intento de modificación ajena.',
+                'content' => 'Intento de modificación ajena.',
             ]
         );
     }
@@ -364,35 +355,28 @@ class MemoryStorageTest extends TestCase
         $conversation = $profile
             ->conversations()
             ->create([
-                'title' =>
-                    'Origen de memoria',
+                'title' => 'Origen de memoria',
             ]);
 
         $message = $conversation
             ->messages()
             ->create([
-                'role' =>
-                    MessageRole::User,
+                'role' => MessageRole::User,
 
-                'content' =>
-                    'Mi comida favorita es el sushi.',
+                'content' => 'Mi comida favorita es el sushi.',
 
-                'status' =>
-                    Message::STATUS_COMPLETED,
+                'status' => Message::STATUS_COMPLETED,
             ]);
 
         $memory = $this->createMemory(
             $user,
             $profile,
             [
-                'source_message_id' =>
-                    $message->id,
+                'source_message_id' => $message->id,
 
-                'type' =>
-                    MemoryType::UserPreference,
+                'type' => MemoryType::UserPreference,
 
-                'content' =>
-                    'La comida favorita del usuario es el sushi.',
+                'content' => 'La comida favorita del usuario es el sushi.',
             ]
         );
 
@@ -436,21 +420,17 @@ class MemoryStorageTest extends TestCase
         $otherConversation = $otherProfile
             ->conversations()
             ->create([
-                'title' =>
-                    'Otra conversación',
+                'title' => 'Otra conversación',
             ]);
 
         $foreignMessage = $otherConversation
             ->messages()
             ->create([
-                'role' =>
-                    MessageRole::User,
+                'role' => MessageRole::User,
 
-                'content' =>
-                    'Mensaje ajeno',
+                'content' => 'Mensaje ajeno',
 
-                'status' =>
-                    Message::STATUS_COMPLETED,
+                'status' => Message::STATUS_COMPLETED,
             ]);
 
         try {
@@ -458,8 +438,7 @@ class MemoryStorageTest extends TestCase
                 $owner,
                 $ownerProfile,
                 [
-                    'source_message_id' =>
-                        $foreignMessage->id,
+                    'source_message_id' => $foreignMessage->id,
                 ]
             );
 
@@ -498,11 +477,9 @@ class MemoryStorageTest extends TestCase
                 $user,
                 $profile,
                 [
-                    'type' =>
-                        MemoryType::TemporaryContext,
+                    'type' => MemoryType::TemporaryContext,
 
-                    'content' =>
-                        'Contexto válido únicamente durante un tiempo.',
+                    'content' => 'Contexto válido únicamente durante un tiempo.',
                 ]
             );
 
@@ -540,14 +517,11 @@ class MemoryStorageTest extends TestCase
             $user,
             $profile,
             [
-                'type' =>
-                    MemoryType::TemporaryContext,
+                'type' => MemoryType::TemporaryContext,
 
-                'content' =>
-                    'El usuario está preparando una prueba.',
+                'content' => 'El usuario está preparando una prueba.',
 
-                'expires_at' =>
-                    now()->addHour(),
+                'expires_at' => now()->addHour(),
             ]
         );
 

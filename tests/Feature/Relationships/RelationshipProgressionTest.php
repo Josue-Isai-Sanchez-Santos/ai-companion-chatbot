@@ -11,6 +11,8 @@ use App\Ai\DTOs\GeneratedReply;
 use App\Ai\Prompts\RelationshipPromptBuilder;
 use App\Ai\Relationship\RelationshipChange;
 use App\Ai\Relationship\RelationshipUpdater;
+use App\Ai\State\CharacterStateResolver;
+use App\Enums\CharacterMood;
 use App\Enums\MessageRole;
 use App\Enums\RelationshipStage;
 use App\Jobs\UpdateRelationshipState;
@@ -83,39 +85,31 @@ class RelationshipProgressionTest extends TestCase
             $profile
                 ->conversations()
                 ->create([
-                    'title' =>
-                        'Relationship test',
+                    'title' => 'Relationship test',
                 ]);
 
         $userMessage =
             $conversation
                 ->messages()
                 ->create([
-                    'role' =>
-                        MessageRole::User,
+                    'role' => MessageRole::User,
 
-                    'content' =>
-                        $userContent,
+                    'content' => $userContent,
 
-                    'status' =>
-                        Message::STATUS_COMPLETED,
+                    'status' => Message::STATUS_COMPLETED,
                 ]);
 
         $assistantMessage =
             $conversation
                 ->messages()
                 ->create([
-                    'parent_message_id' =>
-                        $userMessage->id,
+                    'parent_message_id' => $userMessage->id,
 
-                    'role' =>
-                        MessageRole::Assistant,
+                    'role' => MessageRole::Assistant,
 
-                    'content' =>
-                        $assistantContent,
+                    'content' => $assistantContent,
 
-                    'status' =>
-                        Message::STATUS_COMPLETED,
+                    'status' => Message::STATUS_COMPLETED,
                 ]);
 
         return [
@@ -202,8 +196,7 @@ class RelationshipProgressionTest extends TestCase
             $assistantMessage,
             new RelationshipChange(
                 significant: true,
-                eventSummary:
-                    'Evento muy positivo.',
+                eventSummary: 'Evento muy positivo.',
                 trustDelta: 99,
                 affectionDelta: 99,
                 familiarityDelta: 99,
@@ -284,8 +277,7 @@ class RelationshipProgressionTest extends TestCase
             $assistantMessage,
             new RelationshipChange(
                 significant: true,
-                eventSummary:
-                    'Evento negativo.',
+                eventSummary: 'Evento negativo.',
                 trustDelta: -99,
                 affectionDelta: -99,
                 familiarityDelta: -99,
@@ -350,8 +342,7 @@ class RelationshipProgressionTest extends TestCase
             $assistantMessage,
             new RelationshipChange(
                 significant: true,
-                eventSummary:
-                    'Evento extremo.',
+                eventSummary: 'Evento extremo.',
                 trustDelta: 99,
                 affectionDelta: 99,
                 familiarityDelta: 99,
@@ -393,8 +384,7 @@ class RelationshipProgressionTest extends TestCase
             );
 
         $profile->update([
-            'relationship_stage' =>
-                RelationshipStage::Strangers,
+            'relationship_stage' => RelationshipStage::Strangers,
 
             'trust' => 79,
             'affection' => 79,
@@ -419,8 +409,7 @@ class RelationshipProgressionTest extends TestCase
             $assistantMessage,
             new RelationshipChange(
                 significant: true,
-                eventSummary:
-                    'Evento significativo.',
+                eventSummary: 'Evento significativo.',
                 trustDelta: 1,
                 affectionDelta: 1,
                 familiarityDelta: 3,
@@ -463,8 +452,7 @@ class RelationshipProgressionTest extends TestCase
             $assistantMessage,
             new RelationshipChange(
                 significant: false,
-                eventSummary:
-                    'Conversación rutinaria.',
+                eventSummary: 'Conversación rutinaria.',
                 trustDelta: 10,
                 affectionDelta: 10,
                 familiarityDelta: 10,
@@ -510,8 +498,7 @@ class RelationshipProgressionTest extends TestCase
         $change =
             new RelationshipChange(
                 significant: true,
-                eventSummary:
-                    'Se fortaleció la confianza.',
+                eventSummary: 'Se fortaleció la confianza.',
                 trustDelta: 3,
                 affectionDelta: 0,
                 familiarityDelta: 0,
@@ -576,23 +563,17 @@ class RelationshipProgressionTest extends TestCase
 
         RelationshipAnalysisAgent::fake([
             [
-                'significant' =>
-                    true,
+                'significant' => true,
 
-                'event_summary' =>
-                    'El usuario expresó confianza explícita.',
+                'event_summary' => 'El usuario expresó confianza explícita.',
 
-                'trust_delta' =>
-                    8,
+                'trust_delta' => 8,
 
-                'affection_delta' =>
-                    2,
+                'affection_delta' => 2,
 
-                'familiarity_delta' =>
-                    2,
+                'familiarity_delta' => 2,
 
-                'tension_delta' =>
-                    0,
+                'tension_delta' => 0,
             ],
         ]);
 
@@ -613,7 +594,7 @@ class RelationshipProgressionTest extends TestCase
                 RelationshipUpdater::class
             ),
             app(
-                \App\Ai\State\CharacterStateResolver::class
+                CharacterStateResolver::class
             )
         );
 
@@ -662,8 +643,7 @@ class RelationshipProgressionTest extends TestCase
             $profile
                 ->conversations()
                 ->create([
-                    'title' =>
-                        'Relationship queue',
+                    'title' => 'Relationship queue',
                 ]);
 
         $fakeChat =
@@ -671,8 +651,7 @@ class RelationshipProgressionTest extends TestCase
 
         $fakeChat->replyWith(
             new GeneratedReply(
-                content:
-                    'Respuesta completada.'
+                content: 'Respuesta completada.'
             )
         );
 
@@ -694,8 +673,7 @@ class RelationshipProgressionTest extends TestCase
 
             fn (
                 UpdateRelationshipState $job
-            ): bool =>
-                $job->conversationId
+            ): bool => $job->conversationId
                     === $conversation->id
                 && $job
                     ->assistantMessageId
@@ -721,8 +699,7 @@ class RelationshipProgressionTest extends TestCase
             $profile
                 ->conversations()
                 ->create([
-                    'title' =>
-                        'Streaming relationship',
+                    'title' => 'Streaming relationship',
                 ]);
 
         $action = app(
@@ -740,8 +717,7 @@ class RelationshipProgressionTest extends TestCase
             $action->complete(
                 $started['assistant'],
                 new GeneratedReply(
-                    content:
-                        'Respuesta completada.'
+                    content: 'Respuesta completada.'
                 )
             );
 
@@ -750,8 +726,7 @@ class RelationshipProgressionTest extends TestCase
 
             fn (
                 UpdateRelationshipState $job
-            ): bool =>
-                $job->conversationId
+            ): bool => $job->conversationId
                     === $conversation->id
                 && $job
                     ->assistantMessageId
@@ -779,23 +754,17 @@ class RelationshipProgressionTest extends TestCase
 
         RelationshipAnalysisAgent::fake([
             [
-                'significant' =>
-                    true,
+                'significant' => true,
 
-                'event_summary' =>
-                    'El usuario fortaleció la confianza.',
+                'event_summary' => 'El usuario fortaleció la confianza.',
 
-                'trust_delta' =>
-                    3,
+                'trust_delta' => 3,
 
-                'affection_delta' =>
-                    2,
+                'affection_delta' => 2,
 
-                'familiarity_delta' =>
-                    1,
+                'familiarity_delta' => 1,
 
-                'tension_delta' =>
-                    0,
+                'tension_delta' => 0,
             ],
         ]);
 
@@ -816,14 +785,14 @@ class RelationshipProgressionTest extends TestCase
                 RelationshipUpdater::class
             ),
             app(
-                \App\Ai\State\CharacterStateResolver::class
+                CharacterStateResolver::class
             )
         );
 
         $profile->refresh();
 
         $this->assertSame(
-            \App\Enums\CharacterMood::Happy,
+            CharacterMood::Happy,
             $profile->current_mood
         );
 
@@ -834,5 +803,4 @@ class RelationshipProgressionTest extends TestCase
                 ->name
         );
     }
-
 }

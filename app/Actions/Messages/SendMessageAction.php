@@ -42,12 +42,11 @@ class SendMessageAction
         );
 
         $validated = [
-            'message' =>
-                $this
-                    ->inputValidator
-                    ->validateMessage(
-                        $content
-                    ),
+            'message' => $this
+                ->inputValidator
+                ->validateMessage(
+                    $content
+                ),
         ];
 
         $this

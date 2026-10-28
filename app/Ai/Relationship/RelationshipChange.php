@@ -20,43 +20,37 @@ final readonly class RelationshipChange
         array $data
     ): self {
         return new self(
-            significant:
-                (bool) (
-                    $data['significant']
-                    ?? false
-                ),
+            significant: (bool) (
+                $data['significant']
+                ?? false
+            ),
 
-            eventSummary:
-                trim(
-                    (string) (
-                        $data['event_summary']
-                        ?? ''
-                    )
-                ),
+            eventSummary: trim(
+                (string) (
+                    $data['event_summary']
+                    ?? ''
+                )
+            ),
 
-            trustDelta:
-                (int) (
-                    $data['trust_delta']
-                    ?? 0
-                ),
+            trustDelta: (int) (
+                $data['trust_delta']
+                ?? 0
+            ),
 
-            affectionDelta:
-                (int) (
-                    $data['affection_delta']
-                    ?? 0
-                ),
+            affectionDelta: (int) (
+                $data['affection_delta']
+                ?? 0
+            ),
 
-            familiarityDelta:
-                (int) (
-                    $data['familiarity_delta']
-                    ?? 0
-                ),
+            familiarityDelta: (int) (
+                $data['familiarity_delta']
+                ?? 0
+            ),
 
-            tensionDelta:
-                (int) (
-                    $data['tension_delta']
-                    ?? 0
-                ),
+            tensionDelta: (int) (
+                $data['tension_delta']
+                ?? 0
+            ),
         );
     }
 
@@ -71,17 +65,13 @@ final readonly class RelationshipChange
     public function deltas(): array
     {
         return [
-            'trust' =>
-                $this->trustDelta,
+            'trust' => $this->trustDelta,
 
-            'affection' =>
-                $this->affectionDelta,
+            'affection' => $this->affectionDelta,
 
-            'familiarity' =>
-                $this->familiarityDelta,
+            'familiarity' => $this->familiarityDelta,
 
-            'tension' =>
-                $this->tensionDelta,
+            'tension' => $this->tensionDelta,
         ];
     }
 }

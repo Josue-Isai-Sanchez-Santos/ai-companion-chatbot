@@ -30,11 +30,9 @@ final class GeneratedAsset extends Model
     protected function casts(): array
     {
         return [
-            'type' =>
-                AssetType::class,
+            'type' => AssetType::class,
 
-            'size_bytes' =>
-                'integer',
+            'size_bytes' => 'integer',
         ];
     }
 
@@ -97,17 +95,13 @@ final class GeneratedAsset extends Model
         }
 
         $asset = new self([
-            'user_character_profile_id' =>
-                $profile->id,
+            'user_character_profile_id' => $profile->id,
 
-            'type' =>
-                $type,
+            'type' => $type,
 
-            'mime_type' =>
-                $mimeType,
+            'mime_type' => $mimeType,
 
-            'size_bytes' =>
-                $sizeBytes,
+            'size_bytes' => $sizeBytes,
         ]);
 
         /*
@@ -117,10 +111,9 @@ final class GeneratedAsset extends Model
          * generated path.
          */
         $asset->forceFill([
-            'path' =>
-                self::generatePath(
-                    $profile
-                ),
+            'path' => self::generatePath(
+                $profile
+            ),
         ]);
 
         $asset->save();

@@ -66,8 +66,7 @@ class MessageList extends Component
 
         $this->dispatch(
             'messages-updated',
-            conversationId:
-                $this->conversationId
+            conversationId: $this->conversationId
         );
     }
 
@@ -135,11 +134,9 @@ class MessageList extends Component
             [
                 'messages' => $messages,
 
-                'latestCompletedAssistantId' =>
-                    $latestCompletedAssistantId,
+                'latestCompletedAssistantId' => $latestCompletedAssistantId,
 
-                'latestAssistantAlternativeCount' =>
-                    $latestAssistantAlternativeCount,
+                'latestAssistantAlternativeCount' => $latestAssistantAlternativeCount,
             ]
         );
     }

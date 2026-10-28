@@ -8,9 +8,7 @@ use Laravel\Ai\Contracts\HasStructuredOutput;
 use Laravel\Ai\Promptable;
 use Stringable;
 
-final class RelationshipAnalysisAgent implements
-    Agent,
-    HasStructuredOutput
+final class RelationshipAnalysisAgent implements Agent, HasStructuredOutput
 {
     use Promptable;
 
@@ -98,43 +96,37 @@ INSTRUCTIONS;
         JsonSchema $schema
     ): array {
         return [
-            'significant' =>
-                $schema
-                    ->boolean()
-                    ->required(),
+            'significant' => $schema
+                ->boolean()
+                ->required(),
 
-            'event_summary' =>
-                $schema
-                    ->string()
-                    ->required(),
+            'event_summary' => $schema
+                ->string()
+                ->required(),
 
-            'trust_delta' =>
-                $schema
-                    ->integer()
-                    ->min(-10)
-                    ->max(10)
-                    ->required(),
+            'trust_delta' => $schema
+                ->integer()
+                ->min(-10)
+                ->max(10)
+                ->required(),
 
-            'affection_delta' =>
-                $schema
-                    ->integer()
-                    ->min(-10)
-                    ->max(10)
-                    ->required(),
+            'affection_delta' => $schema
+                ->integer()
+                ->min(-10)
+                ->max(10)
+                ->required(),
 
-            'familiarity_delta' =>
-                $schema
-                    ->integer()
-                    ->min(-10)
-                    ->max(10)
-                    ->required(),
+            'familiarity_delta' => $schema
+                ->integer()
+                ->min(-10)
+                ->max(10)
+                ->required(),
 
-            'tension_delta' =>
-                $schema
-                    ->integer()
-                    ->min(-10)
-                    ->max(10)
-                    ->required(),
+            'tension_delta' => $schema
+                ->integer()
+                ->min(-10)
+                ->max(10)
+                ->required(),
         ];
     }
 }

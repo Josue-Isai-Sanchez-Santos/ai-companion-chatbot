@@ -46,8 +46,7 @@ class StreamedAiResponseTest extends TestCase
         $conversation = $profile
             ->conversations()
             ->create([
-                'title' =>
-                    'Prueba streaming',
+                'title' => 'Prueba streaming',
             ]);
 
         return [
@@ -67,8 +66,7 @@ class StreamedAiResponseTest extends TestCase
 
         $fake->replyWith(
             new GeneratedReply(
-                content:
-                    'Hola desde streaming.',
+                content: 'Hola desde streaming.',
 
                 metadata: [
                     'fake' => true,
@@ -95,16 +93,13 @@ class StreamedAiResponseTest extends TestCase
                 route('chat.stream'),
 
                 [
-                    'conversation_id' =>
-                        $conversation->id,
+                    'conversation_id' => $conversation->id,
 
-                    'message' =>
-                        'Respóndeme progresivamente',
+                    'message' => 'Respóndeme progresivamente',
                 ],
 
                 [
-                    'Accept' =>
-                        'application/json, text/event-stream',
+                    'Accept' => 'application/json, text/event-stream',
                 ]
             );
 
@@ -223,16 +218,13 @@ class StreamedAiResponseTest extends TestCase
                 route('chat.stream'),
 
                 [
-                    'conversation_id' =>
-                        $conversation->id,
+                    'conversation_id' => $conversation->id,
 
-                    'message' =>
-                        'Provoca un fallo',
+                    'message' => 'Provoca un fallo',
                 ],
 
                 [
-                    'Accept' =>
-                        'application/json, text/event-stream',
+                    'Accept' => 'application/json, text/event-stream',
                 ]
             );
 
@@ -270,8 +262,7 @@ class StreamedAiResponseTest extends TestCase
 
         $fake->replyWith(
             new GeneratedReply(
-                content:
-                    'Respuesta recuperada.',
+                content: 'Respuesta recuperada.',
 
                 metadata: [
                     'fake' => true,
@@ -294,13 +285,11 @@ class StreamedAiResponseTest extends TestCase
                 ),
 
                 [
-                    'assistant_message_id' =>
-                        $assistantId,
+                    'assistant_message_id' => $assistantId,
                 ],
 
                 [
-                    'Accept' =>
-                        'application/json, text/event-stream',
+                    'Accept' => 'application/json, text/event-stream',
                 ]
             );
 
@@ -395,8 +384,7 @@ class StreamedAiResponseTest extends TestCase
 
         $fake->replyWith(
             new GeneratedReply(
-                content:
-                    'Respuesta después de reconectar.',
+                content: 'Respuesta después de reconectar.',
 
                 metadata: [
                     'fake' => true,
@@ -425,13 +413,11 @@ class StreamedAiResponseTest extends TestCase
                 ),
 
                 [
-                    'assistant_message_id' =>
-                        $assistantId,
+                    'assistant_message_id' => $assistantId,
                 ],
 
                 [
-                    'Accept' =>
-                        'application/json, text/event-stream',
+                    'Accept' => 'application/json, text/event-stream',
                 ]
             );
 

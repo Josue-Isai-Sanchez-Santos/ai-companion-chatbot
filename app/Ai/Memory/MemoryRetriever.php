@@ -162,8 +162,7 @@ final class MemoryRetriever
             ->whereVectorSimilarTo(
                 'embedding',
                 $queryEmbedding,
-                minSimilarity:
-                    $minimumSimilarity
+                minSimilarity: $minimumSimilarity
             )
             ->limit(
                 $candidateLimit
@@ -225,13 +224,11 @@ final class MemoryRetriever
                 $memories->modelKeys()
             )
             ->update([
-                'access_count' =>
-                    DB::raw(
-                        'access_count + 1'
-                    ),
+                'access_count' => DB::raw(
+                    'access_count + 1'
+                ),
 
-                'last_accessed_at' =>
-                    $now,
+                'last_accessed_at' => $now,
             ]);
 
         foreach ($memories as $memory) {

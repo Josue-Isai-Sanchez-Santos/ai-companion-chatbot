@@ -9,8 +9,7 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'default_stage' =>
-        RelationshipStage::Strangers->value,
+    'default_stage' => RelationshipStage::Strangers->value,
 
     /*
     |--------------------------------------------------------------------------

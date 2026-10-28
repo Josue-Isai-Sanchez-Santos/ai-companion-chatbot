@@ -71,10 +71,8 @@ class GeneratedAssetTest extends TestCase
             GeneratedAsset::registerForProfile(
                 $profile,
                 AssetType::Other,
-                mimeType:
-                    'text/plain',
-                sizeBytes:
-                    4
+                mimeType: 'text/plain',
+                sizeBytes: 4
             );
 
         Storage::disk(
@@ -87,23 +85,17 @@ class GeneratedAssetTest extends TestCase
         $this->assertDatabaseHas(
             'generated_assets',
             [
-                'id' =>
-                    $asset->id,
+                'id' => $asset->id,
 
-                'user_character_profile_id' =>
-                    $profile->id,
+                'user_character_profile_id' => $profile->id,
 
-                'type' =>
-                    AssetType::Other->value,
+                'type' => AssetType::Other->value,
 
-                'path' =>
-                    $asset->path,
+                'path' => $asset->path,
 
-                'mime_type' =>
-                    'text/plain',
+                'mime_type' => 'text/plain',
 
-                'size_bytes' =>
-                    4,
+                'size_bytes' => 4,
             ]
         );
 
@@ -188,8 +180,7 @@ class GeneratedAssetTest extends TestCase
             $asset->path;
 
         $asset->fill([
-            'path' =>
-                '../../outside.txt',
+            'path' => '../../outside.txt',
         ])->save();
 
         $asset->refresh();
@@ -281,10 +272,8 @@ class GeneratedAssetTest extends TestCase
             GeneratedAsset::registerForProfile(
                 $profile,
                 AssetType::Video,
-                mimeType:
-                    'video/mp4',
-                sizeBytes:
-                    8
+                mimeType: 'video/mp4',
+                sizeBytes: 8
             );
 
         Storage::disk('local')
@@ -309,8 +298,7 @@ class GeneratedAssetTest extends TestCase
         $this->assertDatabaseMissing(
             'generated_assets',
             [
-                'id' =>
-                    $assetId,
+                'id' => $assetId,
             ]
         );
 
@@ -322,8 +310,7 @@ class GeneratedAssetTest extends TestCase
         $this->assertDatabaseMissing(
             'user_character_profiles',
             [
-                'id' =>
-                    $oldProfileId,
+                'id' => $oldProfileId,
             ]
         );
 

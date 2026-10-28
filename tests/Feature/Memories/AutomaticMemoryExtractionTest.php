@@ -126,37 +126,29 @@ class AutomaticMemoryExtractionTest extends TestCase
         $conversation = $profile
             ->conversations()
             ->create([
-                'title' =>
-                    'Extracción automática',
+                'title' => 'Extracción automática',
             ]);
 
         $userMessage = $conversation
             ->messages()
             ->create([
-                'role' =>
-                    MessageRole::User,
+                'role' => MessageRole::User,
 
-                'content' =>
-                    'Mi comida favorita es el sushi.',
+                'content' => 'Mi comida favorita es el sushi.',
 
-                'status' =>
-                    Message::STATUS_COMPLETED,
+                'status' => Message::STATUS_COMPLETED,
             ]);
 
         $assistantMessage = $conversation
             ->messages()
             ->create([
-                'parent_message_id' =>
-                    $userMessage->id,
+                'parent_message_id' => $userMessage->id,
 
-                'role' =>
-                    MessageRole::Assistant,
+                'role' => MessageRole::Assistant,
 
-                'content' =>
-                    'Entendido.',
+                'content' => 'Entendido.',
 
-                'status' =>
-                    Message::STATUS_COMPLETED,
+                'status' => Message::STATUS_COMPLETED,
             ]);
 
         return [
@@ -187,20 +179,15 @@ class AutomaticMemoryExtractionTest extends TestCase
             [
                 'memories' => [
                     [
-                        'type' =>
-                            MemoryType::UserPreference->value,
+                        'type' => MemoryType::UserPreference->value,
 
-                        'content' =>
-                            'La comida favorita del usuario es el sushi.',
+                        'content' => 'La comida favorita del usuario es el sushi.',
 
-                        'importance' =>
-                            0.85,
+                        'importance' => 0.85,
 
-                        'confidence' =>
-                            0.98,
+                        'confidence' => 0.98,
 
-                        'source_message_id' =>
-                            $userMessage->id,
+                        'source_message_id' => $userMessage->id,
                     ],
                 ],
             ],
@@ -281,37 +268,27 @@ class AutomaticMemoryExtractionTest extends TestCase
             [
                 'memories' => [
                     [
-                        'type' =>
-                            MemoryType::TemporaryContext->value,
+                        'type' => MemoryType::TemporaryContext->value,
 
-                        'content' =>
-                            'El usuario tiene sueño ahora.',
+                        'content' => 'El usuario tiene sueño ahora.',
 
-                        'importance' =>
-                            0.8,
+                        'importance' => 0.8,
 
-                        'confidence' =>
-                            0.9,
+                        'confidence' => 0.9,
 
-                        'source_message_id' =>
-                            $userMessage->id,
+                        'source_message_id' => $userMessage->id,
                     ],
 
                     [
-                        'type' =>
-                            MemoryType::UserFact->value,
+                        'type' => MemoryType::UserFact->value,
 
-                        'content' =>
-                            'Quizá el usuario prefiera pizza.',
+                        'content' => 'Quizá el usuario prefiera pizza.',
 
-                        'importance' =>
-                            0.8,
+                        'importance' => 0.8,
 
-                        'confidence' =>
-                            0.3,
+                        'confidence' => 0.3,
 
-                        'source_message_id' =>
-                            $userMessage->id,
+                        'source_message_id' => $userMessage->id,
                     ],
                 ],
             ],
@@ -370,20 +347,15 @@ class AutomaticMemoryExtractionTest extends TestCase
             $user,
             $profile,
             [
-                'type' =>
-                    MemoryType::UserPreference,
+                'type' => MemoryType::UserPreference,
 
-                'content' =>
-                    'El usuario prefiere sushi.',
+                'content' => 'El usuario prefiere sushi.',
 
-                'importance' =>
-                    0.9,
+                'importance' => 0.9,
 
-                'confidence' =>
-                    1.0,
+                'confidence' => 1.0,
 
-                'embedding' =>
-                    $embedding,
+                'embedding' => $embedding,
             ]
         );
 
@@ -393,20 +365,15 @@ class AutomaticMemoryExtractionTest extends TestCase
             [
                 'memories' => [
                     [
-                        'type' =>
-                            MemoryType::UserPreference->value,
+                        'type' => MemoryType::UserPreference->value,
 
-                        'content' =>
-                            'La comida favorita del usuario es sushi.',
+                        'content' => 'La comida favorita del usuario es sushi.',
 
-                        'importance' =>
-                            0.9,
+                        'importance' => 0.9,
 
-                        'confidence' =>
-                            0.98,
+                        'confidence' => 0.98,
 
-                        'source_message_id' =>
-                            $userMessage->id,
+                        'source_message_id' => $userMessage->id,
                     ],
                 ],
             ],
@@ -449,8 +416,7 @@ class AutomaticMemoryExtractionTest extends TestCase
         $conversation = $profile
             ->conversations()
             ->create([
-                'title' =>
-                    'Queue test',
+                'title' => 'Queue test',
             ]);
 
         $fakeChat =
@@ -458,8 +424,7 @@ class AutomaticMemoryExtractionTest extends TestCase
 
         $fakeChat->replyWith(
             new GeneratedReply(
-                content:
-                    'Respuesta completada.'
+                content: 'Respuesta completada.'
             )
         );
 
@@ -481,8 +446,7 @@ class AutomaticMemoryExtractionTest extends TestCase
 
             fn (
                 ExtractConversationMemories $job
-            ): bool =>
-                $job->conversationId
+            ): bool => $job->conversationId
                     === $conversation->id
                 && $job->throughMessageId
                     === $result['assistant']->id
@@ -508,8 +472,7 @@ class AutomaticMemoryExtractionTest extends TestCase
         $conversation = $profile
             ->conversations()
             ->create([
-                'title' =>
-                    'Streaming queue test',
+                'title' => 'Streaming queue test',
             ]);
 
         $action = app(
@@ -525,8 +488,7 @@ class AutomaticMemoryExtractionTest extends TestCase
         $completed = $action->complete(
             $started['assistant'],
             new GeneratedReply(
-                content:
-                    'Lo tendré en cuenta.'
+                content: 'Lo tendré en cuenta.'
             )
         );
 
@@ -535,8 +497,7 @@ class AutomaticMemoryExtractionTest extends TestCase
 
             fn (
                 ExtractConversationMemories $job
-            ): bool =>
-                $job->conversationId
+            ): bool => $job->conversationId
                     === $conversation->id
                 && $job->throughMessageId
                     === $completed->id
@@ -560,37 +521,29 @@ class AutomaticMemoryExtractionTest extends TestCase
         $conversation = $profile
             ->conversations()
             ->create([
-                'title' =>
-                    'Transient state',
+                'title' => 'Transient state',
             ]);
 
         $userMessage = $conversation
             ->messages()
             ->create([
-                'role' =>
-                    MessageRole::User,
+                'role' => MessageRole::User,
 
-                'content' =>
-                    'Hoy estoy cansado porque dormí poco.',
+                'content' => 'Hoy estoy cansado porque dormí poco.',
 
-                'status' =>
-                    Message::STATUS_COMPLETED,
+                'status' => Message::STATUS_COMPLETED,
             ]);
 
         $assistantMessage = $conversation
             ->messages()
             ->create([
-                'parent_message_id' =>
-                    $userMessage->id,
+                'parent_message_id' => $userMessage->id,
 
-                'role' =>
-                    MessageRole::Assistant,
+                'role' => MessageRole::Assistant,
 
-                'content' =>
-                    'Espero que puedas descansar.',
+                'content' => 'Espero que puedas descansar.',
 
-                'status' =>
-                    Message::STATUS_COMPLETED,
+                'status' => Message::STATUS_COMPLETED,
             ]);
 
         $fakeEmbedding =
@@ -600,20 +553,15 @@ class AutomaticMemoryExtractionTest extends TestCase
             [
                 'memories' => [
                     [
-                        'type' =>
-                            MemoryType::UserFact->value,
+                        'type' => MemoryType::UserFact->value,
 
-                        'content' =>
-                            'El usuario está cansado porque durmió poco.',
+                        'content' => 'El usuario está cansado porque durmió poco.',
 
-                        'importance' =>
-                            0.7,
+                        'importance' => 0.7,
 
-                        'confidence' =>
-                            0.9,
+                        'confidence' => 0.9,
 
-                        'source_message_id' =>
-                            $userMessage->id,
+                        'source_message_id' => $userMessage->id,
                     ],
                 ],
             ],
@@ -654,38 +602,30 @@ class AutomaticMemoryExtractionTest extends TestCase
         $conversation = $profile
             ->conversations()
             ->create([
-                'title' =>
-                    'Suggestion test',
+                'title' => 'Suggestion test',
             ]);
 
         $userMessage = $conversation
             ->messages()
             ->create([
-                'role' =>
-                    MessageRole::User,
+                'role' => MessageRole::User,
 
-                'content' =>
-                    'Mi comida favorita es el sushi.',
+                'content' => 'Mi comida favorita es el sushi.',
 
-                'status' =>
-                    Message::STATUS_COMPLETED,
+                'status' => Message::STATUS_COMPLETED,
             ]);
 
         $assistantMessage = $conversation
             ->messages()
             ->create([
-                'parent_message_id' =>
-                    $userMessage->id,
+                'parent_message_id' => $userMessage->id,
 
-                'role' =>
-                    MessageRole::Assistant,
+                'role' => MessageRole::Assistant,
 
-                'content' =>
-                    'Quizás algún día podríamos hablar '
+                'content' => 'Quizás algún día podríamos hablar '
                     .'sobre preparar sushi en Pachuca.',
 
-                'status' =>
-                    Message::STATUS_COMPLETED,
+                'status' => Message::STATUS_COMPLETED,
             ]);
 
         $fakeEmbedding =
@@ -695,21 +635,16 @@ class AutomaticMemoryExtractionTest extends TestCase
             [
                 'memories' => [
                     [
-                        'type' =>
-                            MemoryType::SharedEvent->value,
+                        'type' => MemoryType::SharedEvent->value,
 
-                        'content' =>
-                            'El asistente quiere hablar sobre '
+                        'content' => 'El asistente quiere hablar sobre '
                             .'preparar sushi en Pachuca.',
 
-                        'importance' =>
-                            0.7,
+                        'importance' => 0.7,
 
-                        'confidence' =>
-                            0.9,
+                        'confidence' => 0.9,
 
-                        'source_message_id' =>
-                            $assistantMessage->id,
+                        'source_message_id' => $assistantMessage->id,
                     ],
                 ],
             ],
@@ -738,7 +673,6 @@ class AutomaticMemoryExtractionTest extends TestCase
         );
     }
 
-
     public function test_obvious_preference_is_normalized_from_user_fact(): void
     {
         $user = User::factory()
@@ -761,20 +695,15 @@ class AutomaticMemoryExtractionTest extends TestCase
             [
                 'memories' => [
                     [
-                        'type' =>
-                            MemoryType::UserFact->value,
+                        'type' => MemoryType::UserFact->value,
 
-                        'content' =>
-                            'La comida favorita del usuario es el sushi.',
+                        'content' => 'La comida favorita del usuario es el sushi.',
 
-                        'importance' =>
-                            0.8,
+                        'importance' => 0.8,
 
-                        'confidence' =>
-                            1.0,
+                        'confidence' => 1.0,
 
-                        'source_message_id' =>
-                            $userMessage->id,
+                        'source_message_id' => $userMessage->id,
                     ],
                 ],
             ],
@@ -804,5 +733,4 @@ class AutomaticMemoryExtractionTest extends TestCase
             $memory->type
         );
     }
-
 }

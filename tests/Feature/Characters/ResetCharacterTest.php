@@ -96,94 +96,72 @@ class ResetCharacterTest extends TestCase
 
         $profile->update([
             'custom_personality' => [
-                'marker' =>
-                    'CUSTOM_PERSONALITY',
+                'marker' => 'CUSTOM_PERSONALITY',
             ],
 
             'custom_speaking_style' => [
-                'marker' =>
-                    'CUSTOM_STYLE',
+                'marker' => 'CUSTOM_STYLE',
             ],
 
-            'custom_scenario' =>
-                'CUSTOM_SCENARIO',
+            'custom_scenario' => 'CUSTOM_SCENARIO',
 
-            'nickname_for_user' =>
-                'USER_NICKNAME',
+            'nickname_for_user' => 'USER_NICKNAME',
 
-            'nickname_for_character' =>
-                'CHARACTER_NICKNAME',
+            'nickname_for_character' => 'CHARACTER_NICKNAME',
 
-            'current_mood' =>
-                CharacterMood::Happy,
+            'current_mood' => CharacterMood::Happy,
 
-            'current_expression_id' =>
-                $happy->id,
+            'current_expression_id' => $happy->id,
 
-            'relationship_stage' =>
-                RelationshipStage::Friends,
+            'relationship_stage' => RelationshipStage::Friends,
 
             'trust' => 40,
             'affection' => 35,
             'familiarity' => 50,
             'tension' => 12,
 
-            'last_interaction_at' =>
-                now(),
+            'last_interaction_at' => now(),
         ]);
 
         $conversation =
             $profile
                 ->conversations()
                 ->create([
-                    'title' =>
-                        'Conversación anterior',
+                    'title' => 'Conversación anterior',
 
-                    'summary' =>
-                        'OLD_SUMMARY',
+                    'summary' => 'OLD_SUMMARY',
 
-                    'summary_updated_at' =>
-                        now(),
+                    'summary_updated_at' => now(),
 
-                    'last_message_at' =>
-                        now(),
+                    'last_message_at' => now(),
                 ]);
 
         $userMessage =
             $conversation
                 ->messages()
                 ->create([
-                    'role' =>
-                        MessageRole::User,
+                    'role' => MessageRole::User,
 
-                    'content' =>
-                        'Mensaje anterior',
+                    'content' => 'Mensaje anterior',
 
-                    'status' =>
-                        Message::STATUS_COMPLETED,
+                    'status' => Message::STATUS_COMPLETED,
 
-                    'is_active_branch' =>
-                        true,
+                    'is_active_branch' => true,
                 ]);
 
         $assistant =
             $conversation
                 ->messages()
                 ->create([
-                    'parent_message_id' =>
-                        $userMessage->id,
+                    'parent_message_id' => $userMessage->id,
 
-                    'role' =>
-                        MessageRole::Assistant,
+                    'role' => MessageRole::Assistant,
 
-                    'content' =>
-                        'Respuesta anterior',
+                    'content' => 'Respuesta anterior',
 
-                    'status' =>
-                        Message::STATUS_COMPLETED,
+                    'status' => Message::STATUS_COMPLETED,
 
-                    'is_active_branch' =>
-                        true,
+                    'is_active_branch' => true,
                 ]);
 
         /*
@@ -193,47 +171,36 @@ class ResetCharacterTest extends TestCase
         $conversation
             ->messages()
             ->create([
-                'parent_message_id' =>
-                    $userMessage->id,
+                'parent_message_id' => $userMessage->id,
 
-                'role' =>
-                    MessageRole::Assistant,
+                'role' => MessageRole::Assistant,
 
-                'content' =>
-                    'Rama alternativa antigua',
+                'content' => 'Rama alternativa antigua',
 
-                'status' =>
-                    Message::STATUS_COMPLETED,
+                'status' => Message::STATUS_COMPLETED,
 
-                'is_active_branch' =>
-                    false,
+                'is_active_branch' => false,
             ]);
 
         $memory =
             $profile
                 ->memories()
                 ->create([
-                    'source_message_id' =>
-                        $userMessage->id,
+                    'source_message_id' => $userMessage->id,
 
-                    'type' =>
-                        MemoryType::UserFact,
+                    'type' => MemoryType::UserFact,
 
-                    'content' =>
-                        'OLD_MEMORY',
+                    'content' => 'OLD_MEMORY',
 
-                    'importance' =>
-                        0.8,
+                    'importance' => 0.8,
 
-                    'confidence' =>
-                        1.0,
+                    'confidence' => 1.0,
 
-                    'embedding' =>
-                        array_fill(
-                            0,
-                            Memory::EMBEDDING_DIMENSIONS,
-                            0.01
-                        ),
+                    'embedding' => array_fill(
+                        0,
+                        Memory::EMBEDDING_DIMENSIONS,
+                        0.01
+                    ),
                 ]);
 
         $relationshipEvent = app(
@@ -245,8 +212,7 @@ class ResetCharacterTest extends TestCase
             $assistant,
             new RelationshipChange(
                 significant: true,
-                eventSummary:
-                    'Evento previo al reset.',
+                eventSummary: 'Evento previo al reset.',
                 trustDelta: 3,
                 affectionDelta: 2,
                 familiarityDelta: 1,
@@ -259,8 +225,7 @@ class ResetCharacterTest extends TestCase
         );
 
         $this->character->update([
-            'avatar_path' =>
-                'characters/base-avatar.png',
+            'avatar_path' => 'characters/base-avatar.png',
         ]);
 
         $neutral =
@@ -269,8 +234,7 @@ class ResetCharacterTest extends TestCase
                 ->firstOrFail();
 
         $neutral->update([
-            'image_path' =>
-                'characters/neutral.png',
+            'image_path' => 'characters/neutral.png',
         ]);
 
         Storage::disk('public')
@@ -400,57 +364,48 @@ class ResetCharacterTest extends TestCase
         $this->assertDatabaseMissing(
             'user_character_profiles',
             [
-                'id' =>
-                    $oldProfileId,
+                'id' => $oldProfileId,
             ]
         );
 
         $this->assertDatabaseMissing(
             'conversations',
             [
-                'id' =>
-                    $conversation->id,
+                'id' => $conversation->id,
             ]
         );
 
         $this->assertDatabaseMissing(
             'messages',
             [
-                'id' =>
-                    $userMessage->id,
+                'id' => $userMessage->id,
             ]
         );
 
         $this->assertDatabaseMissing(
             'memories',
             [
-                'id' =>
-                    $memory->id,
+                'id' => $memory->id,
             ]
         );
 
         $this->assertDatabaseMissing(
             'relationship_events',
             [
-                'id' =>
-                    $relationshipEvent->id,
+                'id' => $relationshipEvent->id,
             ]
         );
 
         $this->assertDatabaseHas(
             'conversations',
             [
-                'id' =>
-                    $newConversation->id,
+                'id' => $newConversation->id,
 
-                'user_character_profile_id' =>
-                    $newProfile->id,
+                'user_character_profile_id' => $newProfile->id,
 
-                'title' =>
-                    'Nueva conversación',
+                'title' => 'Nueva conversación',
 
-                'summary' =>
-                    null,
+                'summary' => null,
             ]
         );
 
@@ -474,25 +429,20 @@ class ResetCharacterTest extends TestCase
         $this->assertDatabaseHas(
             'characters',
             [
-                'id' =>
-                    $this->character->id,
+                'id' => $this->character->id,
 
-                'avatar_path' =>
-                    'characters/base-avatar.png',
+                'avatar_path' => 'characters/base-avatar.png',
             ]
         );
 
         $this->assertDatabaseHas(
             'character_expressions',
             [
-                'id' =>
-                    $neutral->id,
+                'id' => $neutral->id,
 
-                'image_path' =>
-                    'characters/neutral.png',
+                'image_path' => 'characters/neutral.png',
 
-                'is_default' =>
-                    true,
+                'is_default' => true,
             ]
         );
 
@@ -588,11 +538,9 @@ class ResetCharacterTest extends TestCase
                     'character.reset'
                 ),
                 [
-                    'profile_id' =>
-                        $profile->id,
+                    'profile_id' => $profile->id,
 
-                    'confirmation' =>
-                        'borrar',
+                    'confirmation' => 'borrar',
                 ]
             )
             ->assertRedirect(
@@ -605,8 +553,7 @@ class ResetCharacterTest extends TestCase
         $this->assertDatabaseHas(
             'user_character_profiles',
             [
-                'id' =>
-                    $profile->id,
+                'id' => $profile->id,
             ]
         );
 
@@ -661,24 +608,19 @@ class ResetCharacterTest extends TestCase
             $profile
                 ->conversations()
                 ->create([
-                    'title' =>
-                        'Debe sobrevivir',
+                    'title' => 'Debe sobrevivir',
                 ]);
 
         $conversation
             ->messages()
             ->create([
-                'role' =>
-                    MessageRole::User,
+                'role' => MessageRole::User,
 
-                'content' =>
-                    'Debe sobrevivir',
+                'content' => 'Debe sobrevivir',
 
-                'status' =>
-                    Message::STATUS_COMPLETED,
+                'status' => Message::STATUS_COMPLETED,
 
-                'is_active_branch' =>
-                    true,
+                'is_active_branch' => true,
             ]);
 
         $assetDirectory = app(
@@ -735,22 +677,18 @@ class ResetCharacterTest extends TestCase
         $this->assertDatabaseHas(
             'user_character_profiles',
             [
-                'id' =>
-                    $oldProfileId,
+                'id' => $oldProfileId,
 
-                'user_id' =>
-                    $user->id,
+                'user_id' => $user->id,
             ]
         );
 
         $this->assertDatabaseHas(
             'conversations',
             [
-                'id' =>
-                    $conversation->id,
+                'id' => $conversation->id,
 
-                'user_character_profile_id' =>
-                    $oldProfileId,
+                'user_character_profile_id' => $oldProfileId,
             ]
         );
 
@@ -784,8 +722,7 @@ class ResetCharacterTest extends TestCase
         Livewire::test(
             ResetCharacterModal::class,
             [
-                'profileId' =>
-                    $profile->id,
+                'profileId' => $profile->id,
             ]
         )
             ->assertSee(
@@ -826,8 +763,7 @@ class ResetCharacterTest extends TestCase
         $profile
             ->conversations()
             ->create([
-                'title' =>
-                    'Vieja conversación',
+                'title' => 'Vieja conversación',
             ]);
 
         $this
@@ -839,11 +775,9 @@ class ResetCharacterTest extends TestCase
                     'character.reset'
                 ),
                 [
-                    'profile_id' =>
-                        $oldProfileId,
+                    'profile_id' => $oldProfileId,
 
-                    'confirmation' =>
-                        'BORRAR',
+                    'confirmation' => 'BORRAR',
                 ]
             )
             ->assertRedirect(

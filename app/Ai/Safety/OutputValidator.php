@@ -25,17 +25,13 @@ final class OutputValidator
         );
 
         return new GeneratedReply(
-            content:
-                $content,
+            content: $content,
 
-            metadata:
-                $reply->metadata,
+            metadata: $reply->metadata,
 
-            tokenCount:
-                $reply->tokenCount,
+            tokenCount: $reply->tokenCount,
 
-            status:
-                $reply->status,
+            status: $reply->status,
         );
     }
 

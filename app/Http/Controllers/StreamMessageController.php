@@ -126,14 +126,11 @@ class StreamMessageController extends Controller
                     $this->emit(
                         'started',
                         [
-                            'conversation_id' =>
-                                $conversation->id,
+                            'conversation_id' => $conversation->id,
 
-                            'user_message_id' =>
-                                $userMessage->id,
+                            'user_message_id' => $userMessage->id,
 
-                            'assistant_message_id' =>
-                                $assistant->id,
+                            'assistant_message_id' => $assistant->id,
 
                             'attempt' => (int) data_get(
                                 $assistant->metadata,
@@ -161,8 +158,7 @@ class StreamMessageController extends Controller
                             $this->emit(
                                 'delta',
                                 [
-                                    'assistant_message_id' =>
-                                        $assistant->id,
+                                    'assistant_message_id' => $assistant->id,
 
                                     'delta' => $delta,
                                 ]
@@ -202,14 +198,11 @@ class StreamMessageController extends Controller
                     $this->emit(
                         'completed',
                         [
-                            'assistant_message_id' =>
-                                $completed->id,
+                            'assistant_message_id' => $completed->id,
 
-                            'status' =>
-                                $completed->status,
+                            'status' => $completed->status,
 
-                            'token_count' =>
-                                $completed->token_count,
+                            'token_count' => $completed->token_count,
                         ]
                     );
                 } catch (AiGatewayException $exception) {
@@ -228,14 +221,11 @@ class StreamMessageController extends Controller
                     $this->emit(
                         'failed',
                         [
-                            'assistant_message_id' =>
-                                $failed->id,
+                            'assistant_message_id' => $failed->id,
 
-                            'status' =>
-                                $failed->status,
+                            'status' => $failed->status,
 
-                            'message' =>
-                                'No fue posible completar la respuesta de IA. Puedes reintentarla.',
+                            'message' => 'No fue posible completar la respuesta de IA. Puedes reintentarla.',
                         ]
                     );
                 } catch (Throwable $exception) {
@@ -254,14 +244,11 @@ class StreamMessageController extends Controller
                     $this->emit(
                         'failed',
                         [
-                            'assistant_message_id' =>
-                                $failed->id,
+                            'assistant_message_id' => $failed->id,
 
-                            'status' =>
-                                $failed->status,
+                            'status' => $failed->status,
 
-                            'message' =>
-                                'La respuesta se interrumpió por un error inesperado. Puedes reintentarla.',
+                            'message' => 'La respuesta se interrumpió por un error inesperado. Puedes reintentarla.',
                         ]
                     );
                 }
@@ -272,8 +259,7 @@ class StreamMessageController extends Controller
             [
                 'Content-Type' => 'text/event-stream',
 
-                'Cache-Control' =>
-                    'no-cache, no-transform',
+                'Cache-Control' => 'no-cache, no-transform',
 
                 'X-Accel-Buffering' => 'no',
             ]

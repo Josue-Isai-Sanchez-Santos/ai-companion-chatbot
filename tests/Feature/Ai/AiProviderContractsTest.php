@@ -291,5 +291,4 @@ class AiProviderContractsTest extends TestCase
             $gateway
         );
     }
-
 }

@@ -42,59 +42,41 @@ class RelationshipEvent extends Model
     protected function casts(): array
     {
         return [
-            'from_stage' =>
-                RelationshipStage::class,
+            'from_stage' => RelationshipStage::class,
 
-            'to_stage' =>
-                RelationshipStage::class,
+            'to_stage' => RelationshipStage::class,
 
-            'requested_trust_delta' =>
-                'integer',
+            'requested_trust_delta' => 'integer',
 
-            'applied_trust_delta' =>
-                'integer',
+            'applied_trust_delta' => 'integer',
 
-            'trust_before' =>
-                'integer',
+            'trust_before' => 'integer',
 
-            'trust_after' =>
-                'integer',
+            'trust_after' => 'integer',
 
-            'requested_affection_delta' =>
-                'integer',
+            'requested_affection_delta' => 'integer',
 
-            'applied_affection_delta' =>
-                'integer',
+            'applied_affection_delta' => 'integer',
 
-            'affection_before' =>
-                'integer',
+            'affection_before' => 'integer',
 
-            'affection_after' =>
-                'integer',
+            'affection_after' => 'integer',
 
-            'requested_familiarity_delta' =>
-                'integer',
+            'requested_familiarity_delta' => 'integer',
 
-            'applied_familiarity_delta' =>
-                'integer',
+            'applied_familiarity_delta' => 'integer',
 
-            'familiarity_before' =>
-                'integer',
+            'familiarity_before' => 'integer',
 
-            'familiarity_after' =>
-                'integer',
+            'familiarity_after' => 'integer',
 
-            'requested_tension_delta' =>
-                'integer',
+            'requested_tension_delta' => 'integer',
 
-            'applied_tension_delta' =>
-                'integer',
+            'applied_tension_delta' => 'integer',
 
-            'tension_before' =>
-                'integer',
+            'tension_before' => 'integer',
 
-            'tension_after' =>
-                'integer',
+            'tension_after' => 'integer',
         ];
     }
 

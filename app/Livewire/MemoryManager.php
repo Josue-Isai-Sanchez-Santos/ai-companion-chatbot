@@ -158,21 +158,17 @@ final class MemoryManager extends Component
         $attributes = [
             'type' => $type,
 
-            'content' =>
-                $content,
+            'content' => $content,
 
-            'importance' =>
-                (float) $validated[
+            'importance' => (float) $validated[
                     'formImportance'
                 ],
 
-            'confidence' =>
-                (float) $validated[
+            'confidence' => (float) $validated[
                     'formConfidence'
                 ],
 
-            'expires_at' =>
-                $expiresAt,
+            'expires_at' => $expiresAt,
         ];
 
         if (
@@ -195,11 +191,9 @@ final class MemoryManager extends Component
                 [
                     ...$attributes,
 
-                    'source_message_id' =>
-                        null,
+                    'source_message_id' => null,
 
-                    'embedding' =>
-                        $embedding,
+                    'embedding' => $embedding,
                 ]
             );
 
@@ -320,17 +314,13 @@ final class MemoryManager extends Component
         return view(
             'livewire.memory-manager',
             [
-                'profile' =>
-                    $profile,
+                'profile' => $profile,
 
-                'character' =>
-                    $profile->character,
+                'character' => $profile->character,
 
-                'memories' =>
-                    $memories,
+                'memories' => $memories,
 
-                'typeLabels' =>
-                    $this->typeLabels(),
+                'typeLabels' => $this->typeLabels(),
             ]
         );
     }
@@ -470,29 +460,21 @@ final class MemoryManager extends Component
     private function typeLabels(): array
     {
         return [
-            MemoryType::UserFact->value =>
-                'Hecho del usuario',
+            MemoryType::UserFact->value => 'Hecho del usuario',
 
-            MemoryType::UserPreference->value =>
-                'Preferencia del usuario',
+            MemoryType::UserPreference->value => 'Preferencia del usuario',
 
-            MemoryType::CharacterFact->value =>
-                'Hecho del personaje',
+            MemoryType::CharacterFact->value => 'Hecho del personaje',
 
-            MemoryType::SharedEvent->value =>
-                'Evento compartido',
+            MemoryType::SharedEvent->value => 'Evento compartido',
 
-            MemoryType::Promise->value =>
-                'Promesa',
+            MemoryType::Promise->value => 'Promesa',
 
-            MemoryType::RelationshipEvent->value =>
-                'Evento de relación',
+            MemoryType::RelationshipEvent->value => 'Evento de relación',
 
-            MemoryType::WorldFact->value =>
-                'Hecho del mundo',
+            MemoryType::WorldFact->value => 'Hecho del mundo',
 
-            MemoryType::TemporaryContext->value =>
-                'Contexto temporal',
+            MemoryType::TemporaryContext->value => 'Contexto temporal',
         ];
     }
 

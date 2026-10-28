@@ -47,8 +47,7 @@ final class DeleteMessageBranchAction
                         ->is_active_branch
                 ) {
                     throw ValidationException::withMessages([
-                        'message_id' =>
-                            'Solo se puede eliminar una rama inactiva.',
+                        'message_id' => 'Solo se puede eliminar una rama inactiva.',
                     ]);
                 }
 
@@ -70,8 +69,7 @@ final class DeleteMessageBranchAction
 
                 if ($containsActiveMessage) {
                     throw ValidationException::withMessages([
-                        'message_id' =>
-                            'La rama contiene mensajes activos y no puede eliminarse.',
+                        'message_id' => 'La rama contiene mensajes activos y no puede eliminarse.',
                     ]);
                 }
 
@@ -169,18 +167,16 @@ final class DeleteMessageBranchAction
                     ->map(
                         static fn (
                             mixed $id
-                        ): int =>
-                            (int) $id
+                        ): int => (int) $id
                     )
                     ->filter(
                         static fn (
                             int $id
-                        ): bool =>
-                            ! in_array(
-                                $id,
-                                $all,
-                                true
-                            )
+                        ): bool => ! in_array(
+                            $id,
+                            $all,
+                            true
+                        )
                     )
                     ->values()
                     ->all();

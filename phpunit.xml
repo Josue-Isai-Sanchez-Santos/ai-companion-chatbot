@@ -38,6 +38,36 @@
         -->
         <env name="AI_CHAT_DRIVER" value="simulated" force="true"/>
         <env name="AI_EMBEDDING_DRIVER" value="simulated" force="true"/>
+        <!--
+    AI Companion v2.0:
+    Keep the new architecture deterministic during tests.
+-->
+<!-- AI Companion v2.0 - Simulation-only testing -->
+
+<env name="AI_V2_ENABLED"
+     value="false"
+     force="true"
+     verbatim="true"/>
+
+<env name="AI_INFERENCE_MODE"
+     value="simulated"
+     force="true"/>
+
+<env name="AI_EXTERNAL_REQUESTS_ALLOWED"
+     value="false"
+     force="true"
+     verbatim="true"/>
+
+<env name="AI_DIRECTOR_DRIVER"
+     value="simulated"
+     force="true"/>
+
+<env name="AI_NARRATOR_DRIVER"
+     value="simulated"
+     force="true"/>
+
+        <env name="AI_DIRECTOR_DRIVER" value="simulated" force="true"/>
+        <env name="AI_NARRATOR_DRIVER" value="simulated" force="true"/>
         <env name="OPENAI_API_KEY" value="" force="true"/>
         <env name="OLLAMA_API_KEY" value="" force="true"/>
         <env name="SESSION_DRIVER" value="array"/>

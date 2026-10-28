@@ -99,33 +99,25 @@ class ConversationSummaryTest extends TestCase
         $userMessage = $conversation
             ->messages()
             ->create([
-                'parent_message_id' =>
-                    $parentId,
+                'parent_message_id' => $parentId,
 
-                'role' =>
-                    MessageRole::User,
+                'role' => MessageRole::User,
 
-                'content' =>
-                    $userContent,
+                'content' => $userContent,
 
-                'status' =>
-                    Message::STATUS_COMPLETED,
+                'status' => Message::STATUS_COMPLETED,
             ]);
 
         $assistantMessage = $conversation
             ->messages()
             ->create([
-                'parent_message_id' =>
-                    $userMessage->id,
+                'parent_message_id' => $userMessage->id,
 
-                'role' =>
-                    MessageRole::Assistant,
+                'role' => MessageRole::Assistant,
 
-                'content' =>
-                    $assistantContent,
+                'content' => $assistantContent,
 
-                'status' =>
-                    Message::STATUS_COMPLETED,
+                'status' => Message::STATUS_COMPLETED,
             ]);
 
         return [
@@ -144,8 +136,7 @@ class ConversationSummaryTest extends TestCase
                 [
                     'id' => 10,
                     'role' => 'user',
-                    'content' =>
-                        'MENSAJE_NUEVO_MARKER',
+                    'content' => 'MENSAJE_NUEVO_MARKER',
                 ],
             ],
             1500
@@ -184,8 +175,7 @@ class ConversationSummaryTest extends TestCase
         $conversation = $profile
             ->conversations()
             ->create([
-                'title' =>
-                    'Below threshold',
+                'title' => 'Below threshold',
             ]);
 
         [
@@ -199,8 +189,7 @@ class ConversationSummaryTest extends TestCase
 
         ConversationSummaryAgent::fake([
             [
-                'summary' =>
-                    'ESTO_NO_DEBE_GUARDARSE',
+                'summary' => 'ESTO_NO_DEBE_GUARDARSE',
             ],
         ]);
 
@@ -243,8 +232,7 @@ class ConversationSummaryTest extends TestCase
         $conversation = $profile
             ->conversations()
             ->create([
-                'title' =>
-                    'Summary threshold',
+                'title' => 'Summary threshold',
             ]);
 
         $this->addTurn(
@@ -264,8 +252,7 @@ class ConversationSummaryTest extends TestCase
 
         ConversationSummaryAgent::fake([
             [
-                'summary' =>
-                    'El usuario está planeando un viaje a Japón.',
+                'summary' => 'El usuario está planeando un viaje a Japón.',
             ],
         ]);
 
@@ -328,8 +315,7 @@ class ConversationSummaryTest extends TestCase
         $conversation = $profile
             ->conversations()
             ->create([
-                'title' =>
-                    'Summary queue',
+                'title' => 'Summary queue',
             ]);
 
         $fakeChat =
@@ -337,8 +323,7 @@ class ConversationSummaryTest extends TestCase
 
         $fakeChat->replyWith(
             new GeneratedReply(
-                content:
-                    'Respuesta completada.'
+                content: 'Respuesta completada.'
             )
         );
 
@@ -360,8 +345,7 @@ class ConversationSummaryTest extends TestCase
 
             fn (
                 RefreshConversationSummary $job
-            ): bool =>
-                $job->conversationId
+            ): bool => $job->conversationId
                     === $conversation->id
                 && $job->throughMessageId
                     === $result['assistant']->id
@@ -382,8 +366,7 @@ class ConversationSummaryTest extends TestCase
         $conversation = $profile
             ->conversations()
             ->create([
-                'title' =>
-                    'Streaming summary queue',
+                'title' => 'Streaming summary queue',
             ]);
 
         $action = app(
@@ -399,8 +382,7 @@ class ConversationSummaryTest extends TestCase
         $completed = $action->complete(
             $started['assistant'],
             new GeneratedReply(
-                content:
-                    'Respuesta streaming.'
+                content: 'Respuesta streaming.'
             )
         );
 
@@ -409,8 +391,7 @@ class ConversationSummaryTest extends TestCase
 
             fn (
                 RefreshConversationSummary $job
-            ): bool =>
-                $job->conversationId
+            ): bool => $job->conversationId
                     === $conversation->id
                 && $job->throughMessageId
                     === $completed->id
@@ -434,11 +415,9 @@ class ConversationSummaryTest extends TestCase
         $conversation = $profile
             ->conversations()
             ->create([
-                'title' =>
-                    'Reduced history',
+                'title' => 'Reduced history',
 
-                'summary' =>
-                    'RESUMEN_DE_CONTINUIDAD_MARKER',
+                'summary' => 'RESUMEN_DE_CONTINUIDAD_MARKER',
             ]);
 
         foreach (
@@ -454,14 +433,11 @@ class ConversationSummaryTest extends TestCase
             $conversation
                 ->messages()
                 ->create([
-                    'role' =>
-                        MessageRole::User,
+                    'role' => MessageRole::User,
 
-                    'content' =>
-                        $content,
+                    'content' => $content,
 
-                    'status' =>
-                        Message::STATUS_COMPLETED,
+                    'status' => Message::STATUS_COMPLETED,
                 ]);
         }
 
@@ -526,5 +502,4 @@ class ConversationSummaryTest extends TestCase
             $second->uniqueId()
         );
     }
-
 }

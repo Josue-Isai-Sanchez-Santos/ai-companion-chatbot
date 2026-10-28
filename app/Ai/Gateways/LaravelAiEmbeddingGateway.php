@@ -105,8 +105,7 @@ final class LaravelAiEmbeddingGateway implements EmbeddingGateway
         return array_map(
             static fn (
                 mixed $value
-            ): float =>
-                (float) $value,
+            ): float => (float) $value,
 
             $embedding
         );

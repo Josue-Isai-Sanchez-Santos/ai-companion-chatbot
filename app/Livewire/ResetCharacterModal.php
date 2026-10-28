@@ -55,11 +55,10 @@ final class ResetCharacterModal extends Component
         return view(
             'livewire.reset-character-modal',
             [
-                'confirmationWord' =>
-                    (string) config(
-                        'chatbot.reset_confirmation',
-                        'BORRAR'
-                    ),
+                'confirmationWord' => (string) config(
+                    'chatbot.reset_confirmation',
+                    'BORRAR'
+                ),
             ]
         );
     }

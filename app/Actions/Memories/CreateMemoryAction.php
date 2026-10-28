@@ -52,30 +52,23 @@ class CreateMemoryAction
         return $profile
             ->memories()
             ->create([
-                'source_message_id' =>
-                    $validated['source_message_id'],
+                'source_message_id' => $validated['source_message_id'],
 
-                'type' =>
-                    $validated['type'],
+                'type' => $validated['type'],
 
-                'content' =>
-                    $validated['content'],
+                'content' => $validated['content'],
 
-                'importance' =>
-                    $validated['importance'],
+                'importance' => $validated['importance'],
 
-                'confidence' =>
-                    $validated['confidence'],
+                'confidence' => $validated['confidence'],
 
-                'embedding' =>
-                    $validated['embedding'],
+                'embedding' => $validated['embedding'],
 
                 'access_count' => 0,
 
                 'last_accessed_at' => null,
 
-                'expires_at' =>
-                    $validated['expires_at'],
+                'expires_at' => $validated['expires_at'],
             ]);
     }
 
@@ -206,8 +199,7 @@ class CreateMemoryAction
                 === null
         ) {
             throw ValidationException::withMessages([
-                'expires_at' =>
-                    'Una memoria temporal necesita una fecha de expiración.',
+                'expires_at' => 'Una memoria temporal necesita una fecha de expiración.',
             ]);
         }
     }
@@ -242,8 +234,7 @@ class CreateMemoryAction
 
         if (! $belongsToProfile) {
             throw ValidationException::withMessages([
-                'source_message_id' =>
-                    'El mensaje de origen no pertenece a este perfil.',
+                'source_message_id' => 'El mensaje de origen no pertenece a este perfil.',
             ]);
         }
     }

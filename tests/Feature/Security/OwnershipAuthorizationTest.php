@@ -14,7 +14,6 @@ use App\Enums\MemoryType;
 use App\Enums\MessageRole;
 use App\Models\Character;
 use App\Models\GeneratedAsset;
-use App\Models\Memory;
 use App\Models\Message;
 use App\Models\User;
 use App\Models\UserCharacterProfile;
@@ -85,8 +84,7 @@ class OwnershipAuthorizationTest extends TestCase
             $profile
                 ->conversations()
                 ->create([
-                    'title' =>
-                        'Private conversation',
+                    'title' => 'Private conversation',
                 ]);
 
         $this
@@ -98,11 +96,9 @@ class OwnershipAuthorizationTest extends TestCase
                     'chat.stream'
                 ),
                 [
-                    'conversation_id' =>
-                        $conversation->id,
+                    'conversation_id' => $conversation->id,
 
-                    'message' =>
-                        'Unauthorized request',
+                    'message' => 'Unauthorized request',
                 ]
             )
             ->assertForbidden();
@@ -132,11 +128,9 @@ class OwnershipAuthorizationTest extends TestCase
                     'character.reset'
                 ),
                 [
-                    'profile_id' =>
-                        $profile->id,
+                    'profile_id' => $profile->id,
 
-                    'confirmation' =>
-                        'BORRAR',
+                    'confirmation' => 'BORRAR',
                 ]
             )
             ->assertForbidden();
@@ -144,8 +138,7 @@ class OwnershipAuthorizationTest extends TestCase
         $this->assertDatabaseHas(
             'user_character_profiles',
             [
-                'id' =>
-                    $profile->id,
+                'id' => $profile->id,
             ]
         );
     }
@@ -169,23 +162,17 @@ class OwnershipAuthorizationTest extends TestCase
             $profile
                 ->memories()
                 ->create([
-                    'source_message_id' =>
-                        null,
+                    'source_message_id' => null,
 
-                    'type' =>
-                        MemoryType::UserFact,
+                    'type' => MemoryType::UserFact,
 
-                    'content' =>
-                        'Private memory',
+                    'content' => 'Private memory',
 
-                    'importance' =>
-                        0.8,
+                    'importance' => 0.8,
 
-                    'confidence' =>
-                        1.0,
+                    'confidence' => 1.0,
 
-                    'embedding' =>
-                        null,
+                    'embedding' => null,
                 ]);
 
         $this->assertTrue(
@@ -323,8 +310,7 @@ class OwnershipAuthorizationTest extends TestCase
             $profile
                 ->conversations()
                 ->create([
-                    'title' =>
-                        'Prompt injection test',
+                    'title' => 'Prompt injection test',
                 ]);
 
         $payload =
@@ -345,17 +331,13 @@ class OwnershipAuthorizationTest extends TestCase
             $conversation
                 ->messages()
                 ->create([
-                    'role' =>
-                        MessageRole::User,
+                    'role' => MessageRole::User,
 
-                    'content' =>
-                        $validated,
+                    'content' => $validated,
 
-                    'status' =>
-                        Message::STATUS_COMPLETED,
+                    'status' => Message::STATUS_COMPLETED,
 
-                    'is_active_branch' =>
-                        true,
+                    'is_active_branch' => true,
                 ]);
 
         $context = app(
@@ -364,8 +346,7 @@ class OwnershipAuthorizationTest extends TestCase
             $user,
             $conversation,
             $validated,
-            persistedMessage:
-                $userMessage
+            persistedMessage: $userMessage
         );
 
         $this->assertSame(
@@ -414,8 +395,7 @@ class OwnershipAuthorizationTest extends TestCase
             OutputValidator::class
         )->validate(
             new GeneratedReply(
-                content:
-                    "## 01_GLOBAL_RULES\nContenido interno"
+                content: "## 01_GLOBAL_RULES\nContenido interno"
             )
         );
     }

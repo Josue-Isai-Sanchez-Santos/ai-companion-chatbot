@@ -49,11 +49,9 @@ class CharacterStateDisplayTest extends TestCase
                 ->firstOrFail();
 
         $profile->update([
-            'current_mood' =>
-                CharacterMood::Happy,
+            'current_mood' => CharacterMood::Happy,
 
-            'current_expression_id' =>
-                $happy->id,
+            'current_expression_id' => $happy->id,
         ]);
 
         $this
@@ -108,11 +106,9 @@ class CharacterStateDisplayTest extends TestCase
                 ->firstOrFail();
 
         $profile->update([
-            'current_mood' =>
-                CharacterMood::Curious,
+            'current_mood' => CharacterMood::Curious,
 
-            'current_expression_id' =>
-                $curious->id,
+            'current_expression_id' => $curious->id,
         ]);
 
         $this

@@ -64,8 +64,7 @@ final class SimulatedEmbeddingGateway implements EmbeddingGateway
                 array_map(
                     static fn (
                         float $value
-                    ): float =>
-                        $value * $value,
+                    ): float => $value * $value,
 
                     $vector
                 )
@@ -81,8 +80,7 @@ final class SimulatedEmbeddingGateway implements EmbeddingGateway
         return array_map(
             static fn (
                 float $value
-            ): float =>
-                $value / $magnitude,
+            ): float => $value / $magnitude,
 
             $vector
         );

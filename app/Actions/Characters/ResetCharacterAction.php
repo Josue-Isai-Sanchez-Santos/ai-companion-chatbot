@@ -140,46 +140,33 @@ final class ResetCharacterAction
                 $audit =
                     ResetAudit::query()
                         ->create([
-                            'user_id' =>
-                                $user->id,
+                            'user_id' => $user->id,
 
-                            'character_id' =>
-                                $character->id,
+                            'character_id' => $character->id,
 
-                            'previous_profile_id' =>
-                                $previousProfileId,
+                            'previous_profile_id' => $previousProfileId,
 
-                            'new_profile_id' =>
-                                $newProfile->id,
+                            'new_profile_id' => $newProfile->id,
 
-                            'deleted_conversations' =>
-                                $deletedConversations,
+                            'deleted_conversations' => $deletedConversations,
 
-                            'deleted_messages' =>
-                                $deletedMessages,
+                            'deleted_messages' => $deletedMessages,
 
-                            'deleted_memories' =>
-                                $deletedMemories,
+                            'deleted_memories' => $deletedMemories,
 
-                            'deleted_relationship_events' =>
-                                $deletedRelationshipEvents,
+                            'deleted_relationship_events' => $deletedRelationshipEvents,
 
-                            'reset_at' =>
-                                now(),
+                            'reset_at' => now(),
                         ]);
 
                 return [
-                    'profile' =>
-                        $newProfile,
+                    'profile' => $newProfile,
 
-                    'conversation' =>
-                        $newConversation,
+                    'conversation' => $newConversation,
 
-                    'audit' =>
-                        $audit,
+                    'audit' => $audit,
 
-                    'previous_profile_id' =>
-                        $previousProfileId,
+                    'previous_profile_id' => $previousProfileId,
                 ];
             }
         );
@@ -211,17 +198,13 @@ final class ResetCharacterAction
         }
 
         return [
-            'profile' =>
-                $result['profile'],
+            'profile' => $result['profile'],
 
-            'conversation' =>
-                $result['conversation'],
+            'conversation' => $result['conversation'],
 
-            'audit' =>
-                $result['audit'],
+            'audit' => $result['audit'],
 
-            'assets_deleted' =>
-                $assetsDeleted,
+            'assets_deleted' => $assetsDeleted,
         ];
     }
 }
