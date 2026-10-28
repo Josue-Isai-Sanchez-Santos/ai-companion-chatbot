@@ -71,6 +71,30 @@ return [
             60
         ),
 
+        'context_window' => env(
+            'AI_DIRECTOR_CONTEXT_WINDOW'
+        ),
+
+        'output_format' => env(
+            'AI_DIRECTOR_OUTPUT_FORMAT',
+            'json'
+        ),
+
+        'supports_streaming' => env(
+            'AI_DIRECTOR_STREAMING',
+            false
+        ),
+
+        'supports_structured_output' => env(
+            'AI_DIRECTOR_STRUCTURED_OUTPUT',
+            true
+        ),
+
+        'supports_cancellation' => env(
+            'AI_DIRECTOR_CANCELLATION',
+            false
+        ),
+
     ],
 
     /*
@@ -103,6 +127,30 @@ return [
         'timeout' => (int) env(
             'AI_NARRATOR_TIMEOUT',
             120
+        ),
+
+        'context_window' => env(
+            'AI_NARRATOR_CONTEXT_WINDOW'
+        ),
+
+        'output_format' => env(
+            'AI_NARRATOR_OUTPUT_FORMAT',
+            'segments'
+        ),
+
+        'supports_streaming' => env(
+            'AI_NARRATOR_STREAMING',
+            true
+        ),
+
+        'supports_structured_output' => env(
+            'AI_NARRATOR_STRUCTURED_OUTPUT',
+            true
+        ),
+
+        'supports_cancellation' => env(
+            'AI_NARRATOR_CANCELLATION',
+            false
         ),
 
     ],
