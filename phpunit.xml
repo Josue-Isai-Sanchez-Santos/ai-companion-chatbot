@@ -58,16 +58,10 @@
      force="true"
      verbatim="true"/>
 
-<env name="AI_DIRECTOR_DRIVER"
-     value="simulated"
-     force="true"/>
+<env name="AI_DIRECTOR_DRIVER" value="simulated" force="true"/>
 
-<env name="AI_NARRATOR_DRIVER"
-     value="simulated"
-     force="true"/>
+<env name="AI_NARRATOR_DRIVER" value="simulated" force="true"/>
 
-        <env name="AI_DIRECTOR_DRIVER" value="simulated" force="true"/>
-        <env name="AI_NARRATOR_DRIVER" value="simulated" force="true"/>
         <env name="OPENAI_API_KEY" value="" force="true"/>
         <env name="OLLAMA_API_KEY" value="" force="true"/>
         <env name="SESSION_DRIVER" value="array"/>
