@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Ai\Contracts\AIRoleRouterContract;
 use App\Ai\Contracts\ChatGateway;
 use App\Ai\Contracts\EmbeddingGateway;
+use App\Ai\Routing\AIRoleRouter;
 use App\Models\Character;
 use App\Models\Conversation;
 use App\Models\GeneratedAsset;
@@ -23,6 +25,17 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        /*
+ * AI Companion v2.0 role routing.
+ *
+ * The router only selects model metadata.
+ * It never performs inference.
+ */
+        $this->app->bind(
+            AIRoleRouterContract::class,
+            AIRoleRouter::class
+        );
+
         $this->app->singleton(
             ChatGateway::class,
             function ($app): ChatGateway {
